@@ -5,6 +5,8 @@ Renderer
 
     colors = ["#FFF", "#000"]
 
+    tileSize = 16
+
     module.exports = (I) ->
       self = TouchCanvas(I).extend
         drawTile: (tile, x, y) ->
