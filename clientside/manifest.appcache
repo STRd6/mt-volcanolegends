@@ -1,0 +1,12 @@
+CACHE MANIFEST
+# 1422580668519
+
+CACHE:
+index.html
+../clientside.json.js
+
+
+NETWORK:
+https://*
+http://*
+*
