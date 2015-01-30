@@ -24,8 +24,21 @@
 
 document.body.appendChild renderer.element()
 
+data = <span class="string">"""
+  00001111
+  00111100
+  11100010
+  10101111
+  01010001
+  00001001
+  11000100
+  00000011
+"""</span>.split(<span class="string">"\n"</span>).map (row) -&gt;
+  row.split(<span class="string">""</span>).map (n) -&gt;
+    parseInt(n)
+
 setInterval -&gt;
-  renderer.render [[<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>]]</code></pre>
+  renderer.render data</code></pre>
 </div>
         </li>
         

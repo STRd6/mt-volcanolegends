@@ -204,7 +204,7 @@
     },
     "main.coffee.md": {
       "path": "main.coffee.md",
-      "content": "\n    renderer = require(\"./renderer\")()\n\n    document.body.appendChild renderer.element()\n    \n    setInterval ->\n      renderer.render [[0, 1, 0, 1]]\n",
+      "content": "\n    renderer = require(\"./renderer\")()\n\n    document.body.appendChild renderer.element()\n\n    data = \"\"\"\n      00001111\n      00111100\n      11100010\n      10101111\n      01010001\n      00001001\n      11000100\n      00000011\n    \"\"\".split(\"\\n\").map (row) ->\n      row.split(\"\").map (n) ->\n        parseInt(n)\n\n    setInterval ->\n      renderer.render data\n",
       "mode": "100644"
     },
     "pixie.cson": {
@@ -214,7 +214,7 @@
     },
     "renderer.coffee.md": {
       "path": "renderer.coffee.md",
-      "content": "Renderer\n========\n\n    TouchCanvas = require \"touch-canvas\"\n\n    colors = [\"#FFF\", \"#000\"]\n\n    module.exports = (I) ->\n      self = TouchCanvas(I).extend\n        drawTile: (tile, x, y) ->\n          self.drawRect\n            x: x * tileSize\n            y: y * tileSize\n            width: tileSize\n            height: tileSize\n            color: colors[tile]\n\n        render: (data) ->\n          data.forEach (row, y) ->\n            row.forEach (tile, x) ->\n              self.drawTile tile, x, y\n",
+      "content": "Renderer\n========\n\n    TouchCanvas = require \"touch-canvas\"\n\n    colors = [\"#FFF\", \"#000\"]\n\n    tileSize = 16\n\n    module.exports = (I) ->\n      self = TouchCanvas(I).extend\n        drawTile: (tile, x, y) ->\n          self.drawRect\n            x: x * tileSize\n            y: y * tileSize\n            width: tileSize\n            height: tileSize\n            color: colors[tile]\n\n        render: (data) ->\n          data.forEach (row, y) ->\n            row.forEach (tile, x) ->\n              self.drawTile tile, x, y\n",
       "mode": "100644"
     }
   },
@@ -231,7 +231,7 @@
     },
     "main": {
       "path": "main",
-      "content": "(function() {\n  var renderer;\n\n  renderer = require(\"./renderer\")();\n\n  document.body.appendChild(renderer.element());\n\n  setInterval(function() {\n    return renderer.render([[0, 1, 0, 1]]);\n  });\n\n}).call(this);\n",
+      "content": "(function() {\n  var data, renderer;\n\n  renderer = require(\"./renderer\")();\n\n  document.body.appendChild(renderer.element());\n\n  data = \"00001111\\n00111100\\n11100010\\n10101111\\n01010001\\n00001001\\n11000100\\n00000011\".split(\"\\n\").map(function(row) {\n    return row.split(\"\").map(function(n) {\n      return parseInt(n);\n    });\n  });\n\n  setInterval(function() {\n    return renderer.render(data);\n  });\n\n}).call(this);\n",
       "type": "blob"
     },
     "pixie": {
@@ -241,7 +241,7 @@
     },
     "renderer": {
       "path": "renderer",
-      "content": "(function() {\n  var TouchCanvas, colors;\n\n  TouchCanvas = require(\"touch-canvas\");\n\n  colors = [\"#FFF\", \"#000\"];\n\n  module.exports = function(I) {\n    var self;\n    return self = TouchCanvas(I).extend({\n      drawTile: function(tile, x, y) {\n        return self.drawRect({\n          x: x * tileSize,\n          y: y * tileSize,\n          width: tileSize,\n          height: tileSize,\n          color: colors[tile]\n        });\n      },\n      render: function(data) {\n        return data.forEach(function(row, y) {\n          return row.forEach(function(tile, x) {\n            return self.drawTile(tile, x, y);\n          });\n        });\n      }\n    });\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  var TouchCanvas, colors, tileSize;\n\n  TouchCanvas = require(\"touch-canvas\");\n\n  colors = [\"#FFF\", \"#000\"];\n\n  tileSize = 16;\n\n  module.exports = function(I) {\n    var self;\n    return self = TouchCanvas(I).extend({\n      drawTile: function(tile, x, y) {\n        return self.drawRect({\n          x: x * tileSize,\n          y: y * tileSize,\n          width: tileSize,\n          height: tileSize,\n          color: colors[tile]\n        });\n      },\n      render: function(data) {\n        return data.forEach(function(row, y) {\n          return row.forEach(function(tile, x) {\n            return self.drawTile(tile, x, y);\n          });\n        });\n      }\n    });\n  };\n\n}).call(this);\n",
       "type": "blob"
     }
   },
