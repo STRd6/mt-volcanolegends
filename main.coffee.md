@@ -1,20 +1,17 @@
+Mt. Volcanolegends
+==================
 
-    renderer = require("./renderer")()
+    require "cornerstone"
+
+    renderer = require("./renderer")
+      width: 512
+      height: 512
+
+    world = require("./world")()
 
     document.body.appendChild renderer.element()
 
-    data = """
-      00001111
-      00111100
-      11100010
-      10101111
-      01010001
-      00001001
-      11000100
-      00000011
-    """.split("\n").map (row) ->
-      row.split("").map (n) ->
-        parseInt(n)
-
     setInterval ->
-      renderer.render data
+      world.tick()
+      renderer.render world.terrain()
+    , 1/60
