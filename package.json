@@ -1,0 +1,20 @@
+{
+  "name": "mt-volcanolegends",
+  "version": "0.0.0",
+  "description": "Mount Volcanolegends",
+  "main": "build/server/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node build/server/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/STRd6/mt-volcanolegends.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/STRd6/mt-volcanolegends/issues"
+  },
+  "homepage": "https://github.com/STRd6/mt-volcanolegends"
+}
