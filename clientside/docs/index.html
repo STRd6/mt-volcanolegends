@@ -18,27 +18,36 @@
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
+              <h1 id="mt-volcanolegends">Mt. Volcanolegends</h1>
+
+            </div>
+            <div class="content"><pre><code class="lang-coffeescript">
+</code></pre>
+</div>
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              <div class="pilwrap">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
               
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">renderer = require(<span class="string">"./renderer"</span>)()
+            <div class="content"><pre><code class="lang-coffeescript">require <span class="string">"cornerstone"</span>
+
+renderer = require(<span class="string">"./renderer"</span>)
+  width: <span class="number">512</span>
+  height: <span class="number">512</span>
+
+world = require(<span class="string">"./world"</span>)()
 
 document.body.appendChild renderer.element()
 
-data = <span class="string">"""
-  00001111
-  00111100
-  11100010
-  10101111
-  01010001
-  00001001
-  11000100
-  00000011
-"""</span>.split(<span class="string">"\n"</span>).map (row) -&gt;
-  row.split(<span class="string">""</span>).map (n) -&gt;
-    parseInt(n)
-
 setInterval -&gt;
-  renderer.render data</code></pre>
+  world.tick()
+  renderer.render world.terrain()
+, <span class="number">1</span>/<span class="number">60</span></code></pre>
 </div>
         </li>
         
