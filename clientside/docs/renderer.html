@@ -48,6 +48,15 @@ module.<span class="function"><span class="title">exports</span></span> = (I) -&
   self.attrAccessor <span class="string">"pan"</span>
 
   self.extend
+    drawCharacter: (character) -&gt;
+      {x, y} = character.position().add(<span class="number">0.5</span>, <span class="number">0.5</span>).scale(tileSize)
+
+      self.drawCircle
+        x: x
+        y: y
+        radius: tileSize/<span class="number">2</span>
+        color: <span class="string">"blue"</span>
+
     drawTile: (tile, x, y) -&gt;
       self.drawRect
         x: x * tileSize
@@ -56,13 +65,15 @@ module.<span class="function"><span class="title">exports</span></span> = (I) -&
         height: tileSize
         color: colors[tile]
 
-    render: (data) -&gt;
+    render: ({terrain, characters}) -&gt;
       self.fill <span class="string">"#000"</span>
       {x, y} = self.pan()
       self.withTransform Matrix.translation(x, y), -&gt;
-        data.forEach (row, y) -&gt;
+        terrain.forEach (row, y) -&gt;
           row.forEach (tile, x) -&gt;
             self.drawTile tile, x, y
+
+        characters.forEach self.drawCharacter
 
   <span class="keyword">return</span> self</code></pre>
 </div>

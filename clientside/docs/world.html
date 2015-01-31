@@ -35,6 +35,7 @@
               
             </div>
             <div class="content"><pre><code class="lang-coffeescript">require <span class="string">"cornerstone"</span>
+Character = require <span class="string">"./character"</span>
 
 module.<span class="function"><span class="title">exports</span></span> = (I={}) -&gt;
   defaults I,
@@ -45,8 +46,15 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
     [<span class="number">0.</span>..I.width].map -&gt;
       Math.round rand()
 
+  characters = [
+    Character()
+  ]
+
   select: (start, end) -&gt;
     log start, end
+
+  characters: -&gt;
+    characters
 
   tick: -&gt;
 

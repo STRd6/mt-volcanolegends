@@ -214,17 +214,17 @@
     },
     "renderer.coffee.md": {
       "path": "renderer.coffee.md",
-      "content": "Renderer\n========\n\n    TouchCanvas = require \"touch-canvas\"\n\n    colors = [\"tan\", \"#444\"]\n\n    tileSize = 16\n\n    module.exports = (I) ->\n      self = TouchCanvas(I)\n\n      I.pan = Point I.pan\n\n      self.attrAccessor \"pan\"\n\n      self.extend\n        drawTile: (tile, x, y) ->\n          self.drawRect\n            x: x * tileSize\n            y: y * tileSize\n            width: tileSize\n            height: tileSize\n            color: colors[tile]\n\n        render: (data) ->\n          self.fill \"#000\"\n          {x, y} = self.pan()\n          self.withTransform Matrix.translation(x, y), ->\n            data.forEach (row, y) ->\n              row.forEach (tile, x) ->\n                self.drawTile tile, x, y\n\n      return self\n",
+      "content": "Renderer\n========\n\n    TouchCanvas = require \"touch-canvas\"\n\n    colors = [\"tan\", \"#444\"]\n\n    tileSize = 16\n\n    module.exports = (I) ->\n      self = TouchCanvas(I)\n\n      I.pan = Point I.pan\n\n      self.attrAccessor \"pan\"\n\n      self.extend\n        drawCharacter: (character) ->\n          {x, y} = character.position().add(0.5, 0.5).scale(tileSize)\n\n          self.drawCircle\n            x: x\n            y: y\n            radius: tileSize/2\n            color: \"blue\"\n\n        drawTile: (tile, x, y) ->\n          self.drawRect\n            x: x * tileSize\n            y: y * tileSize\n            width: tileSize\n            height: tileSize\n            color: colors[tile]\n\n        render: ({terrain, characters}) ->\n          self.fill \"#000\"\n          {x, y} = self.pan()\n          self.withTransform Matrix.translation(x, y), ->\n            terrain.forEach (row, y) ->\n              row.forEach (tile, x) ->\n                self.drawTile tile, x, y\n\n            characters.forEach self.drawCharacter\n\n      return self\n",
       "mode": "100644"
     },
     "world.coffee.md": {
       "path": "world.coffee.md",
-      "content": "World\n=====\n\n    require \"cornerstone\"\n\n    module.exports = (I={}) ->\n      defaults I,\n        width: 256\n        height: 256\n\n      I.terrain = [0...I.height].map ->\n        [0...I.width].map ->\n          Math.round rand()\n\n      select: (start, end) ->\n        log start, end\n\n      tick: ->\n\n      terrain: ->\n        I.terrain\n",
+      "content": "World\n=====\n\n    require \"cornerstone\"\n    Character = require \"./character\"\n\n    module.exports = (I={}) ->\n      defaults I,\n        width: 256\n        height: 256\n\n      I.terrain = [0...I.height].map ->\n        [0...I.width].map ->\n          Math.round rand()\n\n      characters = [\n        Character()\n      ]\n\n      select: (start, end) ->\n        log start, end\n\n      characters: ->\n        characters\n\n      tick: ->\n\n      terrain: ->\n        I.terrain\n",
       "mode": "100644"
     },
     "game.coffee.md": {
       "path": "game.coffee.md",
-      "content": "Game\n====\n\n    Renderer = require(\"./renderer\")\n    World = require(\"./world\")\n\n    {width, height} = require \"./pixie\"\n\n    module.exports = ->\n      renderer = Renderer\n        width: width\n        height: height\n\n      # Selection event\n      renderer.include require(\"./selection\")\n\n      renderer.on \"selection\", (start, end) ->\n        # TODO: Translate into world coordinates\n        world.select start, end\n\n      # Pan tool\n      initial = initialPan = null\n      renderer.on \"touch\", (e) ->\n        initial = Point(e)\n        initialPan = renderer.pan()\n      renderer.on \"move\", (e) ->\n        delta = Point(e).subtract(initial)\n        p = Point delta.x * width, delta.y * height\n\n        renderer.pan initialPan.add p\n      renderer.on \"release\", () ->\n        initial = null\n\n      world = World()\n\n      setInterval ->\n        world.tick()\n        renderer.render world.terrain()\n      , 1/60\n\n      return renderer.element()\n",
+      "content": "Game\n====\n\n    Renderer = require(\"./renderer\")\n    World = require(\"./world\")\n\n    {width, height} = require \"./pixie\"\n\n    module.exports = ->\n      renderer = Renderer\n        width: width\n        height: height\n\n      tool = require(\"./tools\").pan\n\n      [\"touch\", \"move\", \"release\"].forEach (event) ->\n        renderer.on event, (point) ->\n          tool[event]?(\n            renderer: renderer\n            point: Point(point)\n          )\n\n      world = World()\n\n      setInterval ->\n        world.tick()\n        renderer.render\n          characters: world.characters()\n          terrain: world.terrain()\n      , 1/60\n\n      return renderer.element()\n",
       "mode": "100644"
     },
     "util.coffee": {
@@ -240,6 +240,16 @@
     "style.styl": {
       "path": "style.styl",
       "content": "*\n  box-sizing: border-box\n\nhtml, body\n  height: 100%\n\nbody\n  font-family: \"HelveticaNeue-Light\", \"Helvetica Neue Light\", \"Helvetica Neue\", Helvetica, Arial, \"Lucida Grande\", sans-serif\n  font-weight: 300\n  color: #444\n  margin: 0\n  overflow: hidden\n",
+      "mode": "100644"
+    },
+    "tools.coffee.md": {
+      "path": "tools.coffee.md",
+      "content": "Tools\n=====\n\n    module.exports =\n      pan: do ->\n        initial = initialPan = null\n        touch: ({renderer, point}) ->\n          initial = point\n          initialPan = renderer.pan()\n        move: ({renderer, point}) ->\n          delta = point.subtract(initial)\n          p = Point delta.x * renderer.width(), delta.y * renderer.height()\n          renderer.pan initialPan.add p\n",
+      "mode": "100644"
+    },
+    "character.coffee.md": {
+      "path": "character.coffee.md",
+      "content": "Character\n=========\n\nThis is a dwarf-like guy who walks around and digs stuff.\n\n    module.exports = (I={}, self=Model(I)) ->\n      defaults I,\n        position: Point(0, 0)\n\n      self.attrAccessor \"position\"\n\n      return self\n",
       "mode": "100644"
     }
   },
@@ -266,17 +276,17 @@
     },
     "renderer": {
       "path": "renderer",
-      "content": "(function() {\n  var TouchCanvas, colors, tileSize;\n\n  TouchCanvas = require(\"touch-canvas\");\n\n  colors = [\"tan\", \"#444\"];\n\n  tileSize = 16;\n\n  module.exports = function(I) {\n    var self;\n    self = TouchCanvas(I);\n    I.pan = Point(I.pan);\n    self.attrAccessor(\"pan\");\n    self.extend({\n      drawTile: function(tile, x, y) {\n        return self.drawRect({\n          x: x * tileSize,\n          y: y * tileSize,\n          width: tileSize,\n          height: tileSize,\n          color: colors[tile]\n        });\n      },\n      render: function(data) {\n        var x, y, _ref;\n        self.fill(\"#000\");\n        _ref = self.pan(), x = _ref.x, y = _ref.y;\n        return self.withTransform(Matrix.translation(x, y), function() {\n          return data.forEach(function(row, y) {\n            return row.forEach(function(tile, x) {\n              return self.drawTile(tile, x, y);\n            });\n          });\n        });\n      }\n    });\n    return self;\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  var TouchCanvas, colors, tileSize;\n\n  TouchCanvas = require(\"touch-canvas\");\n\n  colors = [\"tan\", \"#444\"];\n\n  tileSize = 16;\n\n  module.exports = function(I) {\n    var self;\n    self = TouchCanvas(I);\n    I.pan = Point(I.pan);\n    self.attrAccessor(\"pan\");\n    self.extend({\n      drawCharacter: function(character) {\n        var x, y, _ref;\n        _ref = character.position().add(0.5, 0.5).scale(tileSize), x = _ref.x, y = _ref.y;\n        return self.drawCircle({\n          x: x,\n          y: y,\n          radius: tileSize / 2,\n          color: \"blue\"\n        });\n      },\n      drawTile: function(tile, x, y) {\n        return self.drawRect({\n          x: x * tileSize,\n          y: y * tileSize,\n          width: tileSize,\n          height: tileSize,\n          color: colors[tile]\n        });\n      },\n      render: function(_arg) {\n        var characters, terrain, x, y, _ref;\n        terrain = _arg.terrain, characters = _arg.characters;\n        self.fill(\"#000\");\n        _ref = self.pan(), x = _ref.x, y = _ref.y;\n        return self.withTransform(Matrix.translation(x, y), function() {\n          terrain.forEach(function(row, y) {\n            return row.forEach(function(tile, x) {\n              return self.drawTile(tile, x, y);\n            });\n          });\n          return characters.forEach(self.drawCharacter);\n        });\n      }\n    });\n    return self;\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "world": {
       "path": "world",
-      "content": "(function() {\n  require(\"cornerstone\");\n\n  module.exports = function(I) {\n    var _i, _ref, _results;\n    if (I == null) {\n      I = {};\n    }\n    defaults(I, {\n      width: 256,\n      height: 256\n    });\n    I.terrain = (function() {\n      _results = [];\n      for (var _i = 0, _ref = I.height; 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }\n      return _results;\n    }).apply(this).map(function() {\n      var _i, _ref, _results;\n      return (function() {\n        _results = [];\n        for (var _i = 0, _ref = I.width; 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }\n        return _results;\n      }).apply(this).map(function() {\n        return Math.round(rand());\n      });\n    });\n    return {\n      select: function(start, end) {\n        return log(start, end);\n      },\n      tick: function() {},\n      terrain: function() {\n        return I.terrain;\n      }\n    };\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  var Character;\n\n  require(\"cornerstone\");\n\n  Character = require(\"./character\");\n\n  module.exports = function(I) {\n    var characters, _i, _ref, _results;\n    if (I == null) {\n      I = {};\n    }\n    defaults(I, {\n      width: 256,\n      height: 256\n    });\n    I.terrain = (function() {\n      _results = [];\n      for (var _i = 0, _ref = I.height; 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }\n      return _results;\n    }).apply(this).map(function() {\n      var _i, _ref, _results;\n      return (function() {\n        _results = [];\n        for (var _i = 0, _ref = I.width; 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }\n        return _results;\n      }).apply(this).map(function() {\n        return Math.round(rand());\n      });\n    });\n    characters = [Character()];\n    return {\n      select: function(start, end) {\n        return log(start, end);\n      },\n      characters: function() {\n        return characters;\n      },\n      tick: function() {},\n      terrain: function() {\n        return I.terrain;\n      }\n    };\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "game": {
       "path": "game",
-      "content": "(function() {\n  var Renderer, World, height, width, _ref;\n\n  Renderer = require(\"./renderer\");\n\n  World = require(\"./world\");\n\n  _ref = require(\"./pixie\"), width = _ref.width, height = _ref.height;\n\n  module.exports = function() {\n    var initial, initialPan, renderer, world;\n    renderer = Renderer({\n      width: width,\n      height: height\n    });\n    renderer.include(require(\"./selection\"));\n    renderer.on(\"selection\", function(start, end) {\n      return world.select(start, end);\n    });\n    initial = initialPan = null;\n    renderer.on(\"touch\", function(e) {\n      initial = Point(e);\n      return initialPan = renderer.pan();\n    });\n    renderer.on(\"move\", function(e) {\n      var delta, p;\n      delta = Point(e).subtract(initial);\n      p = Point(delta.x * width, delta.y * height);\n      return renderer.pan(initialPan.add(p));\n    });\n    renderer.on(\"release\", function() {\n      return initial = null;\n    });\n    world = World();\n    setInterval(function() {\n      world.tick();\n      return renderer.render(world.terrain());\n    }, 1 / 60);\n    return renderer.element();\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  var Renderer, World, height, width, _ref;\n\n  Renderer = require(\"./renderer\");\n\n  World = require(\"./world\");\n\n  _ref = require(\"./pixie\"), width = _ref.width, height = _ref.height;\n\n  module.exports = function() {\n    var renderer, tool, world;\n    renderer = Renderer({\n      width: width,\n      height: height\n    });\n    tool = require(\"./tools\").pan;\n    [\"touch\", \"move\", \"release\"].forEach(function(event) {\n      return renderer.on(event, function(point) {\n        return typeof tool[event] === \"function\" ? tool[event]({\n          renderer: renderer,\n          point: Point(point)\n        }) : void 0;\n      });\n    });\n    world = World();\n    setInterval(function() {\n      world.tick();\n      return renderer.render({\n        characters: world.characters(),\n        terrain: world.terrain()\n      });\n    }, 1 / 60);\n    return renderer.element();\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "util": {
@@ -292,6 +302,16 @@
     "style": {
       "path": "style",
       "content": "module.exports = \"* {\\n  -ms-box-sizing: border-box;\\n  -moz-box-sizing: border-box;\\n  -webkit-box-sizing: border-box;\\n  box-sizing: border-box;\\n}\\n\\nhtml,\\nbody {\\n  height: 100%;\\n}\\n\\nbody {\\n  font-family: \\\"HelveticaNeue-Light\\\", \\\"Helvetica Neue Light\\\", \\\"Helvetica Neue\\\", Helvetica, Arial, \\\"Lucida Grande\\\", sans-serif;\\n  font-weight: 300;\\n  color: #444;\\n  margin: 0;\\n  overflow: hidden;\\n}\";",
+      "type": "blob"
+    },
+    "tools": {
+      "path": "tools",
+      "content": "(function() {\n  module.exports = {\n    pan: (function() {\n      var initial, initialPan;\n      initial = initialPan = null;\n      return {\n        touch: function(_arg) {\n          var point, renderer;\n          renderer = _arg.renderer, point = _arg.point;\n          initial = point;\n          return initialPan = renderer.pan();\n        },\n        move: function(_arg) {\n          var delta, p, point, renderer;\n          renderer = _arg.renderer, point = _arg.point;\n          delta = point.subtract(initial);\n          p = Point(delta.x * renderer.width(), delta.y * renderer.height());\n          return renderer.pan(initialPan.add(p));\n        }\n      };\n    })()\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "character": {
+      "path": "character",
+      "content": "(function() {\n  module.exports = function(I, self) {\n    if (I == null) {\n      I = {};\n    }\n    if (self == null) {\n      self = Model(I);\n    }\n    defaults(I, {\n      position: Point(0, 0)\n    });\n    self.attrAccessor(\"position\");\n    return self;\n  };\n\n}).call(this);\n",
       "type": "blob"
     }
   },
