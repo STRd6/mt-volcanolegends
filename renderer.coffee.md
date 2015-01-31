@@ -17,7 +17,11 @@ Renderer
             height: tileSize
             color: colors[tile]
 
+        pan: ->
+          Matrix.translation(0, 0)
+
         render: (data) ->
-          data.forEach (row, y) ->
-            row.forEach (tile, x) ->
-              self.drawTile tile, x, y
+          self.withTransform self.pan(), ->
+            data.forEach (row, y) ->
+              row.forEach (tile, x) ->
+                self.drawTile tile, x, y

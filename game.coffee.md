@@ -4,14 +4,18 @@ Game
     Renderer = require("./renderer")
     World = require("./world")
 
+    {width, height} = require "./pixie"
+
     module.exports = ->
       renderer = Renderer
-        width: 512
-        height: 512
+        width: width
+        height: height
 
       renderer.include require("./selection")
 
-      renderer.on "selection", log
+      renderer.on "selection", (start, end) ->
+        # TODO: Translate into world coordinates
+        world.select start, end
 
       world = World()
 

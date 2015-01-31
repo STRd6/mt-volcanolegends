@@ -4,12 +4,18 @@ World
     require "cornerstone"
 
     module.exports = (I={}) ->
-      I.terrain = [0...32].map ->
-        [0...32].map ->
+      defaults I,
+        width: 256
+        height: 256
+
+      I.terrain = [0...I.height].map ->
+        [0...I.width].map ->
           Math.round rand()
 
+      select: (start, end) ->
+        log start, end
+
       tick: ->
-        I.terrain[rand(32)][rand(32)] = Math.round rand()
 
       terrain: ->
         I.terrain
