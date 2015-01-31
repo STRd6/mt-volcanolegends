@@ -3,12 +3,18 @@ Renderer
 
     TouchCanvas = require "touch-canvas"
 
-    colors = ["#FFF", "#000"]
+    colors = ["tan", "#444"]
 
     tileSize = 16
 
     module.exports = (I) ->
-      self = TouchCanvas(I).extend
+      self = TouchCanvas(I)
+
+      I.pan = Point I.pan
+
+      self.attrAccessor "pan"
+
+      self.extend
         drawTile: (tile, x, y) ->
           self.drawRect
             x: x * tileSize
@@ -17,11 +23,12 @@ Renderer
             height: tileSize
             color: colors[tile]
 
-        pan: ->
-          Matrix.translation(0, 0)
-
         render: (data) ->
-          self.withTransform self.pan(), ->
+          self.fill "#000"
+          {x, y} = self.pan()
+          self.withTransform Matrix.translation(x, y), ->
             data.forEach (row, y) ->
               row.forEach (tile, x) ->
                 self.drawTile tile, x, y
+
+      return self
