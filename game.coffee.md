@@ -25,7 +25,6 @@ Game
         initialPan = renderer.pan()
       renderer.on "move", (e) ->
         delta = Point(e).subtract(initial)
-        
         p = Point delta.x * width, delta.y * height
 
         renderer.pan initialPan.add p
