@@ -58,7 +58,6 @@ module.<span class="function"><span class="title">exports</span></span> = -&gt;
     initialPan = renderer.pan()
   renderer.<span class="literal">on</span> <span class="string">"move"</span>, (e) -&gt;
     delta = Point(e).subtract(initial)
-
     p = Point delta.x * width, delta.y * height
 
     renderer.pan initialPan.add p
