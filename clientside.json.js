@@ -38,7 +38,7 @@ window["STRd6/mt-volcanolegends:clientside"]({
     },
     "main.coffee.md": {
       "path": "main.coffee.md",
-      "content": "Mt. Volcanolegends\n==================\n\n    require \"cornerstone\"\n\n    renderer = require(\"./renderer\")\n      width: 512\n      height: 512\n\n    world = require(\"./world\")()\n\n    document.body.appendChild renderer.element()\n\n    setInterval ->\n      world.tick()\n      renderer.render world.terrain()\n    , 1/60\n",
+      "content": "Mt. Volcanolegends\n==================\n\n    require \"cornerstone\"\n    require \"./util\"\n\n    Game = require \"./game\"\n    document.body.appendChild Game()\n",
       "mode": "100644"
     },
     "pixie.cson": {
@@ -55,6 +55,21 @@ window["STRd6/mt-volcanolegends:clientside"]({
       "path": "world.coffee.md",
       "content": "World\n=====\n\n    require \"cornerstone\"\n\n    module.exports = (I={}) ->\n      I.terrain = [0...32].map ->\n        [0...32].map ->\n          Math.round rand()\n\n      tick: ->\n        I.terrain[rand(32)][rand(32)] = Math.round rand()\n\n      terrain: ->\n        I.terrain\n",
       "mode": "100644"
+    },
+    "game.coffee.md": {
+      "path": "game.coffee.md",
+      "content": "Game\n====\n\n    Renderer = require(\"./renderer\")\n    World = require(\"./world\")\n\n    module.exports = ->\n      renderer = Renderer\n        width: 512\n        height: 512\n\n      renderer.include require(\"./selection\")\n\n      renderer.on \"selection\", log\n\n      world = World()\n\n      setInterval ->\n        world.tick()\n        renderer.render world.terrain()\n      , 1/60\n\n      return renderer.element()\n",
+      "mode": "100644"
+    },
+    "util.coffee": {
+      "path": "util.coffee",
+      "content": "global.log = (args...) ->\n  console.log args...\n",
+      "mode": "100644"
+    },
+    "selection.coffee.md": {
+      "path": "selection.coffee.md",
+      "content": "Selection\n=========\n\n    module.exports = (I, self) ->\n      initial = null\n\n      self.on \"touch\", (point) ->\n        initial = point\n\n      self.on \"release\", (point) ->\n        if initial\n          self.trigger \"selection\", initial, point\n\n        initial = null\n",
+      "mode": "100644"
     }
   },
   "distribution": {
@@ -70,7 +85,7 @@ window["STRd6/mt-volcanolegends:clientside"]({
     },
     "main": {
       "path": "main",
-      "content": "(function() {\n  var renderer, world;\n\n  require(\"cornerstone\");\n\n  renderer = require(\"./renderer\")({\n    width: 512,\n    height: 512\n  });\n\n  world = require(\"./world\")();\n\n  document.body.appendChild(renderer.element());\n\n  setInterval(function() {\n    world.tick();\n    return renderer.render(world.terrain());\n  }, 1 / 60);\n\n}).call(this);\n",
+      "content": "(function() {\n  var Game;\n\n  require(\"cornerstone\");\n\n  require(\"./util\");\n\n  Game = require(\"./game\");\n\n  document.body.appendChild(Game());\n\n}).call(this);\n",
       "type": "blob"
     },
     "pixie": {
@@ -86,6 +101,21 @@ window["STRd6/mt-volcanolegends:clientside"]({
     "world": {
       "path": "world",
       "content": "(function() {\n  require(\"cornerstone\");\n\n  module.exports = function(I) {\n    var _i, _results;\n    if (I == null) {\n      I = {};\n    }\n    I.terrain = (function() {\n      _results = [];\n      for (_i = 0; _i < 32; _i++){ _results.push(_i); }\n      return _results;\n    }).apply(this).map(function() {\n      var _i, _results;\n      return (function() {\n        _results = [];\n        for (_i = 0; _i < 32; _i++){ _results.push(_i); }\n        return _results;\n      }).apply(this).map(function() {\n        return Math.round(rand());\n      });\n    });\n    return {\n      tick: function() {\n        return I.terrain[rand(32)][rand(32)] = Math.round(rand());\n      },\n      terrain: function() {\n        return I.terrain;\n      }\n    };\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "game": {
+      "path": "game",
+      "content": "(function() {\n  var Renderer, World;\n\n  Renderer = require(\"./renderer\");\n\n  World = require(\"./world\");\n\n  module.exports = function() {\n    var renderer, world;\n    renderer = Renderer({\n      width: 512,\n      height: 512\n    });\n    renderer.include(require(\"./selection\"));\n    renderer.on(\"selection\", log);\n    world = World();\n    setInterval(function() {\n      world.tick();\n      return renderer.render(world.terrain());\n    }, 1 / 60);\n    return renderer.element();\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "util": {
+      "path": "util",
+      "content": "(function() {\n  var __slice = [].slice;\n\n  global.log = function() {\n    var args;\n    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];\n    return console.log.apply(console, args);\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "selection": {
+      "path": "selection",
+      "content": "(function() {\n  module.exports = function(I, self) {\n    var initial;\n    initial = null;\n    self.on(\"touch\", function(point) {\n      return initial = point;\n    });\n    return self.on(\"release\", function(point) {\n      if (initial) {\n        self.trigger(\"selection\", initial, point);\n      }\n      return initial = null;\n    });\n  };\n\n}).call(this);\n",
       "type": "blob"
     }
   },
