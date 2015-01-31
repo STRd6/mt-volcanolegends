@@ -44,11 +44,26 @@ module.<span class="function"><span class="title">exports</span></span> = -&gt;
     width: width
     height: height
 
+  <span class="comment"># Selection event</span>
   renderer.include require(<span class="string">"./selection"</span>)
 
   renderer.<span class="literal">on</span> <span class="string">"selection"</span>, (start, end) -&gt;
     <span class="comment"># TODO: Translate into world coordinates</span>
     world.select start, end
+
+  <span class="comment"># Pan tool</span>
+  initial = initialPan = <span class="literal">null</span>
+  renderer.<span class="literal">on</span> <span class="string">"touch"</span>, (e) -&gt;
+    initial = Point(e)
+    initialPan = renderer.pan()
+  renderer.<span class="literal">on</span> <span class="string">"move"</span>, (e) -&gt;
+    delta = Point(e).subtract(initial)
+
+    p = Point delta.x * width, delta.y * height
+
+    renderer.pan initialPan.add p
+  renderer.<span class="literal">on</span> <span class="string">"release"</span>, () -&gt;
+    initial = <span class="literal">null</span>
 
   world = World()
 
