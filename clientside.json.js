@@ -38,27 +38,27 @@ window["STRd6/mt-volcanolegends:clientside"]({
     },
     "main.coffee.md": {
       "path": "main.coffee.md",
-      "content": "Mt. Volcanolegends\n==================\n\n    require \"cornerstone\"\n    require \"./util\"\n\n    Game = require \"./game\"\n    document.body.appendChild Game()\n",
+      "content": "Mt. Volcanolegends\n==================\n\n    require \"cornerstone\"\n    require \"./util\"\n\n    style = document.createElement \"style\"\n    style.innerText = require \"./style\"\n\n    document.head.appendChild style\n\n    Game = require \"./game\"\n    document.body.appendChild Game()\n",
       "mode": "100644"
     },
     "pixie.cson": {
       "path": "pixie.cson",
-      "content": "dependencies:\n  cornerstone: \"distri/cornerstone:v0.2.8\"\n  \"touch-canvas\": \"distri/touch-canvas:v0.3.1\"\n",
+      "content": "dependencies:\n  cornerstone: \"distri/cornerstone:v0.2.8\"\n  \"touch-canvas\": \"distri/touch-canvas:v0.3.1\"\nwidth: 1024\nheight: 576\n",
       "mode": "100644"
     },
     "renderer.coffee.md": {
       "path": "renderer.coffee.md",
-      "content": "Renderer\n========\n\n    TouchCanvas = require \"touch-canvas\"\n\n    colors = [\"#FFF\", \"#000\"]\n\n    tileSize = 16\n\n    module.exports = (I) ->\n      self = TouchCanvas(I).extend\n        drawTile: (tile, x, y) ->\n          self.drawRect\n            x: x * tileSize\n            y: y * tileSize\n            width: tileSize\n            height: tileSize\n            color: colors[tile]\n\n        render: (data) ->\n          data.forEach (row, y) ->\n            row.forEach (tile, x) ->\n              self.drawTile tile, x, y\n",
+      "content": "Renderer\n========\n\n    TouchCanvas = require \"touch-canvas\"\n\n    colors = [\"#FFF\", \"#000\"]\n\n    tileSize = 16\n\n    module.exports = (I) ->\n      self = TouchCanvas(I).extend\n        drawTile: (tile, x, y) ->\n          self.drawRect\n            x: x * tileSize\n            y: y * tileSize\n            width: tileSize\n            height: tileSize\n            color: colors[tile]\n\n        pan: ->\n          Matrix.translation(0, 0)\n\n        render: (data) ->\n          self.withTransform self.pan(), ->\n            data.forEach (row, y) ->\n              row.forEach (tile, x) ->\n                self.drawTile tile, x, y\n",
       "mode": "100644"
     },
     "world.coffee.md": {
       "path": "world.coffee.md",
-      "content": "World\n=====\n\n    require \"cornerstone\"\n\n    module.exports = (I={}) ->\n      I.terrain = [0...32].map ->\n        [0...32].map ->\n          Math.round rand()\n\n      tick: ->\n        I.terrain[rand(32)][rand(32)] = Math.round rand()\n\n      terrain: ->\n        I.terrain\n",
+      "content": "World\n=====\n\n    require \"cornerstone\"\n\n    module.exports = (I={}) ->\n      defaults I,\n        width: 256\n        height: 256\n\n      I.terrain = [0...I.height].map ->\n        [0...I.width].map ->\n          Math.round rand()\n\n      select: (start, end) ->\n        log start, end\n\n      tick: ->\n\n      terrain: ->\n        I.terrain\n",
       "mode": "100644"
     },
     "game.coffee.md": {
       "path": "game.coffee.md",
-      "content": "Game\n====\n\n    Renderer = require(\"./renderer\")\n    World = require(\"./world\")\n\n    module.exports = ->\n      renderer = Renderer\n        width: 512\n        height: 512\n\n      renderer.include require(\"./selection\")\n\n      renderer.on \"selection\", log\n\n      world = World()\n\n      setInterval ->\n        world.tick()\n        renderer.render world.terrain()\n      , 1/60\n\n      return renderer.element()\n",
+      "content": "Game\n====\n\n    Renderer = require(\"./renderer\")\n    World = require(\"./world\")\n\n    {width, height} = require \"./pixie\"\n\n    module.exports = ->\n      renderer = Renderer\n        width: width\n        height: height\n\n      renderer.include require(\"./selection\")\n\n      renderer.on \"selection\", (start, end) ->\n        # TODO: Translate into world coordinates\n        world.select start, end\n\n      world = World()\n\n      setInterval ->\n        world.tick()\n        renderer.render world.terrain()\n      , 1/60\n\n      return renderer.element()\n",
       "mode": "100644"
     },
     "util.coffee": {
@@ -69,6 +69,11 @@ window["STRd6/mt-volcanolegends:clientside"]({
     "selection.coffee.md": {
       "path": "selection.coffee.md",
       "content": "Selection\n=========\n\n    module.exports = (I, self) ->\n      initial = null\n\n      self.on \"touch\", (point) ->\n        initial = point\n\n      self.on \"release\", (point) ->\n        if initial\n          self.trigger \"selection\", initial, point\n\n        initial = null\n",
+      "mode": "100644"
+    },
+    "style.styl": {
+      "path": "style.styl",
+      "content": "*\n  box-sizing: border-box\n\nhtml, body\n  height: 100%\n\nbody\n  font-family: \"HelveticaNeue-Light\", \"Helvetica Neue Light\", \"Helvetica Neue\", Helvetica, Arial, \"Lucida Grande\", sans-serif\n  font-weight: 300\n  color: #444\n  margin: 0\n  overflow: hidden\n",
       "mode": "100644"
     }
   },
@@ -85,27 +90,27 @@ window["STRd6/mt-volcanolegends:clientside"]({
     },
     "main": {
       "path": "main",
-      "content": "(function() {\n  var Game;\n\n  require(\"cornerstone\");\n\n  require(\"./util\");\n\n  Game = require(\"./game\");\n\n  document.body.appendChild(Game());\n\n}).call(this);\n",
+      "content": "(function() {\n  var Game, style;\n\n  require(\"cornerstone\");\n\n  require(\"./util\");\n\n  style = document.createElement(\"style\");\n\n  style.innerText = require(\"./style\");\n\n  document.head.appendChild(style);\n\n  Game = require(\"./game\");\n\n  document.body.appendChild(Game());\n\n}).call(this);\n",
       "type": "blob"
     },
     "pixie": {
       "path": "pixie",
-      "content": "module.exports = {\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.8\",\"touch-canvas\":\"distri/touch-canvas:v0.3.1\"}};",
+      "content": "module.exports = {\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.8\",\"touch-canvas\":\"distri/touch-canvas:v0.3.1\"},\"width\":1024,\"height\":576};",
       "type": "blob"
     },
     "renderer": {
       "path": "renderer",
-      "content": "(function() {\n  var TouchCanvas, colors, tileSize;\n\n  TouchCanvas = require(\"touch-canvas\");\n\n  colors = [\"#FFF\", \"#000\"];\n\n  tileSize = 16;\n\n  module.exports = function(I) {\n    var self;\n    return self = TouchCanvas(I).extend({\n      drawTile: function(tile, x, y) {\n        return self.drawRect({\n          x: x * tileSize,\n          y: y * tileSize,\n          width: tileSize,\n          height: tileSize,\n          color: colors[tile]\n        });\n      },\n      render: function(data) {\n        return data.forEach(function(row, y) {\n          return row.forEach(function(tile, x) {\n            return self.drawTile(tile, x, y);\n          });\n        });\n      }\n    });\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  var TouchCanvas, colors, tileSize;\n\n  TouchCanvas = require(\"touch-canvas\");\n\n  colors = [\"#FFF\", \"#000\"];\n\n  tileSize = 16;\n\n  module.exports = function(I) {\n    var self;\n    return self = TouchCanvas(I).extend({\n      drawTile: function(tile, x, y) {\n        return self.drawRect({\n          x: x * tileSize,\n          y: y * tileSize,\n          width: tileSize,\n          height: tileSize,\n          color: colors[tile]\n        });\n      },\n      pan: function() {\n        return Matrix.translation(0, 0);\n      },\n      render: function(data) {\n        return self.withTransform(self.pan(), function() {\n          return data.forEach(function(row, y) {\n            return row.forEach(function(tile, x) {\n              return self.drawTile(tile, x, y);\n            });\n          });\n        });\n      }\n    });\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "world": {
       "path": "world",
-      "content": "(function() {\n  require(\"cornerstone\");\n\n  module.exports = function(I) {\n    var _i, _results;\n    if (I == null) {\n      I = {};\n    }\n    I.terrain = (function() {\n      _results = [];\n      for (_i = 0; _i < 32; _i++){ _results.push(_i); }\n      return _results;\n    }).apply(this).map(function() {\n      var _i, _results;\n      return (function() {\n        _results = [];\n        for (_i = 0; _i < 32; _i++){ _results.push(_i); }\n        return _results;\n      }).apply(this).map(function() {\n        return Math.round(rand());\n      });\n    });\n    return {\n      tick: function() {\n        return I.terrain[rand(32)][rand(32)] = Math.round(rand());\n      },\n      terrain: function() {\n        return I.terrain;\n      }\n    };\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  require(\"cornerstone\");\n\n  module.exports = function(I) {\n    var _i, _ref, _results;\n    if (I == null) {\n      I = {};\n    }\n    defaults(I, {\n      width: 256,\n      height: 256\n    });\n    I.terrain = (function() {\n      _results = [];\n      for (var _i = 0, _ref = I.height; 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }\n      return _results;\n    }).apply(this).map(function() {\n      var _i, _ref, _results;\n      return (function() {\n        _results = [];\n        for (var _i = 0, _ref = I.width; 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }\n        return _results;\n      }).apply(this).map(function() {\n        return Math.round(rand());\n      });\n    });\n    return {\n      select: function(start, end) {\n        return log(start, end);\n      },\n      tick: function() {},\n      terrain: function() {\n        return I.terrain;\n      }\n    };\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "game": {
       "path": "game",
-      "content": "(function() {\n  var Renderer, World;\n\n  Renderer = require(\"./renderer\");\n\n  World = require(\"./world\");\n\n  module.exports = function() {\n    var renderer, world;\n    renderer = Renderer({\n      width: 512,\n      height: 512\n    });\n    renderer.include(require(\"./selection\"));\n    renderer.on(\"selection\", log);\n    world = World();\n    setInterval(function() {\n      world.tick();\n      return renderer.render(world.terrain());\n    }, 1 / 60);\n    return renderer.element();\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  var Renderer, World, height, width, _ref;\n\n  Renderer = require(\"./renderer\");\n\n  World = require(\"./world\");\n\n  _ref = require(\"./pixie\"), width = _ref.width, height = _ref.height;\n\n  module.exports = function() {\n    var renderer, world;\n    renderer = Renderer({\n      width: width,\n      height: height\n    });\n    renderer.include(require(\"./selection\"));\n    renderer.on(\"selection\", function(start, end) {\n      return world.select(start, end);\n    });\n    world = World();\n    setInterval(function() {\n      world.tick();\n      return renderer.render(world.terrain());\n    }, 1 / 60);\n    return renderer.element();\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "util": {
@@ -116,6 +121,11 @@ window["STRd6/mt-volcanolegends:clientside"]({
     "selection": {
       "path": "selection",
       "content": "(function() {\n  module.exports = function(I, self) {\n    var initial;\n    initial = null;\n    self.on(\"touch\", function(point) {\n      return initial = point;\n    });\n    return self.on(\"release\", function(point) {\n      if (initial) {\n        self.trigger(\"selection\", initial, point);\n      }\n      return initial = null;\n    });\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "style": {
+      "path": "style",
+      "content": "module.exports = \"* {\\n  -ms-box-sizing: border-box;\\n  -moz-box-sizing: border-box;\\n  -webkit-box-sizing: border-box;\\n  box-sizing: border-box;\\n}\\n\\nhtml,\\nbody {\\n  height: 100%;\\n}\\n\\nbody {\\n  font-family: \\\"HelveticaNeue-Light\\\", \\\"Helvetica Neue Light\\\", \\\"Helvetica Neue\\\", Helvetica, Arial, \\\"Lucida Grande\\\", sans-serif;\\n  font-weight: 300;\\n  color: #444;\\n  margin: 0;\\n  overflow: hidden;\\n}\";",
       "type": "blob"
     }
   },

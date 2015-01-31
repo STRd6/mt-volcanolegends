@@ -50,10 +50,14 @@ module.<span class="function"><span class="title">exports</span></span> = (I) -&
         height: tileSize
         color: colors[tile]
 
+    pan: -&gt;
+      Matrix.translation(<span class="number">0</span>, <span class="number">0</span>)
+
     render: (data) -&gt;
-      data.forEach (row, y) -&gt;
-        row.forEach (tile, x) -&gt;
-          self.drawTile tile, x, y</code></pre>
+      self.withTransform self.pan(), -&gt;
+        data.forEach (row, y) -&gt;
+          row.forEach (tile, x) -&gt;
+            self.drawTile tile, x, y</code></pre>
 </div>
         </li>
         

@@ -37,6 +37,11 @@
             <div class="content"><pre><code class="lang-coffeescript">require <span class="string">"cornerstone"</span>
 require <span class="string">"./util"</span>
 
+style = document.createElement <span class="string">"style"</span>
+style.innerText = require <span class="string">"./style"</span>
+
+document.head.appendChild style
+
 Game = require <span class="string">"./game"</span>
 document.body.appendChild Game()</code></pre>
 </div>

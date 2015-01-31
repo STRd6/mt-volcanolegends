@@ -37,14 +37,18 @@
             <div class="content"><pre><code class="lang-coffeescript">Renderer = require(<span class="string">"./renderer"</span>)
 World = require(<span class="string">"./world"</span>)
 
+{width, height} = require <span class="string">"./pixie"</span>
+
 module.<span class="function"><span class="title">exports</span></span> = -&gt;
   renderer = Renderer
-    width: <span class="number">512</span>
-    height: <span class="number">512</span>
+    width: width
+    height: height
 
   renderer.include require(<span class="string">"./selection"</span>)
 
-  renderer.<span class="literal">on</span> <span class="string">"selection"</span>, log
+  renderer.<span class="literal">on</span> <span class="string">"selection"</span>, (start, end) -&gt;
+    <span class="comment"># TODO: Translate into world coordinates</span>
+    world.select start, end
 
   world = World()
 

@@ -37,12 +37,18 @@
             <div class="content"><pre><code class="lang-coffeescript">require <span class="string">"cornerstone"</span>
 
 module.<span class="function"><span class="title">exports</span></span> = (I={}) -&gt;
-  I.terrain = [<span class="number">0.</span>.<span class="number">.32</span>].map -&gt;
-    [<span class="number">0.</span>.<span class="number">.32</span>].map -&gt;
+  defaults I,
+    width: <span class="number">256</span>
+    height: <span class="number">256</span>
+
+  I.terrain = [<span class="number">0.</span>..I.height].map -&gt;
+    [<span class="number">0.</span>..I.width].map -&gt;
       Math.round rand()
 
+  select: (start, end) -&gt;
+    log start, end
+
   tick: -&gt;
-    I.terrain[rand(<span class="number">32</span>)][rand(<span class="number">32</span>)] = Math.round rand()
 
   terrain: -&gt;
     I.terrain</code></pre>
