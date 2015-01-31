@@ -2,6 +2,7 @@ World
 =====
 
     require "cornerstone"
+    Character = require "./character"
 
     module.exports = (I={}) ->
       defaults I,
@@ -12,8 +13,15 @@ World
         [0...I.width].map ->
           Math.round rand()
 
+      characters = [
+        Character()
+      ]
+
       select: (start, end) ->
         log start, end
+
+      characters: ->
+        characters
 
       tick: ->
 

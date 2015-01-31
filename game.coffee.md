@@ -11,31 +11,22 @@ Game
         width: width
         height: height
 
-      # Selection event
-      renderer.include require("./selection")
+      tool = require("./tools").pan
 
-      renderer.on "selection", (start, end) ->
-        # TODO: Translate into world coordinates
-        world.select start, end
-
-      # Pan tool
-      initial = initialPan = null
-      renderer.on "touch", (e) ->
-        initial = Point(e)
-        initialPan = renderer.pan()
-      renderer.on "move", (e) ->
-        delta = Point(e).subtract(initial)
-        p = Point delta.x * width, delta.y * height
-
-        renderer.pan initialPan.add p
-      renderer.on "release", () ->
-        initial = null
+      ["touch", "move", "release"].forEach (event) ->
+        renderer.on event, (point) ->
+          tool[event]?(
+            renderer: renderer
+            point: Point(point)
+          )
 
       world = World()
 
       setInterval ->
         world.tick()
-        renderer.render world.terrain()
+        renderer.render
+          characters: world.characters()
+          terrain: world.terrain()
       , 1/60
 
       return renderer.element()

@@ -15,6 +15,15 @@ Renderer
       self.attrAccessor "pan"
 
       self.extend
+        drawCharacter: (character) ->
+          {x, y} = character.position().add(0.5, 0.5).scale(tileSize)
+
+          self.drawCircle
+            x: x
+            y: y
+            radius: tileSize/2
+            color: "blue"
+
         drawTile: (tile, x, y) ->
           self.drawRect
             x: x * tileSize
@@ -23,12 +32,14 @@ Renderer
             height: tileSize
             color: colors[tile]
 
-        render: (data) ->
+        render: ({terrain, characters}) ->
           self.fill "#000"
           {x, y} = self.pan()
           self.withTransform Matrix.translation(x, y), ->
-            data.forEach (row, y) ->
+            terrain.forEach (row, y) ->
               row.forEach (tile, x) ->
                 self.drawTile tile, x, y
+
+            characters.forEach self.drawCharacter
 
       return self
