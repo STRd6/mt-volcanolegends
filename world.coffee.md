@@ -28,7 +28,7 @@ World
         Graph.accessible
           initial: start
           neighbors: self.neighbors
-          distanceMax: 50
+          distanceMax: distance
 
       select: (start, end) ->
         log start, end

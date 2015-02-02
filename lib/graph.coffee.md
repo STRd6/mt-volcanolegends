@@ -23,6 +23,7 @@ uniquely identifies nodes.
         iterationsMax = 1000
 
         # Table to track our node meta-data
+        # TODO: Need to add unique map key function for Points, etc.
         nodes = new Map
 
         openSet = PriorityQueue
@@ -72,9 +73,17 @@ uniquely identifies nodes.
 
 Find all the nodes accessible within the given distance.
 
-      accessible: ({initial, neighbors, distanceMax}) ->
+      accessible: ({initial, neighbors, distanceMax, key}) ->
         neighbors ?= -> []
         distanceMax ?= 1
+        key ?= (node) ->
+          "#{node}"
+
+        get = (node) ->
+          nodes.get key node
+
+        set = (node, value) ->
+          nodes.set key(node), value
 
         # Table to track our node meta-data
         nodes = new Map
@@ -83,15 +92,15 @@ Find all the nodes accessible within the given distance.
           low: true
 
         push = (node, current, distance=1) ->
-          g = nodes.get(node)?.g ? Infinity
+          g = get(node)?.g ? Infinity
 
           nodeData =
-            g: (nodes.get(current)?.g ? 0) + distance
+            g: (get(current)?.g ? 0) + distance
             node: node
 
           # Update if better
           if nodeData.g < g and nodeData.g <= distanceMax
-            nodes.set(node, nodeData)
+            set(node, nodeData)
             openSet.push node, nodeData.g
 
         push initial, null, 0

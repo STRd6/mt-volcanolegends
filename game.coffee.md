@@ -21,7 +21,7 @@ Game
           )
 
       world = World()
-      
+
       console.log world.neighbors(Point(5, 5))
 
       setInterval ->
