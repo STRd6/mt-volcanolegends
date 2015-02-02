@@ -1,0 +1,5 @@
+dependencies:
+  cornerstone: "distri/cornerstone:v0.2.8"
+  "touch-canvas": "distri/touch-canvas:v0.3.1"
+width: 1024
+height: 576
