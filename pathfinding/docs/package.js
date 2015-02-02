@@ -184,9 +184,45 @@
       "mode": "100644",
       "type": "blob"
     },
+    "character.coffee.md": {
+      "path": "character.coffee.md",
+      "content": "Character\n=========\n\nThis is a dwarf-like guy who walks around and digs stuff.\n\n    module.exports = (I={}, self=Model(I)) ->\n      defaults I,\n        position: Point(0, 0)\n\n      self.attrAccessor \"position\"\n\n      return self\n",
+      "mode": "100644",
+      "type": "blob"
+    },
+    "game.coffee.md": {
+      "path": "game.coffee.md",
+      "content": "Game\n====\n\n    Renderer = require(\"./renderer\")\n    World = require(\"./world\")\n\n    {width, height} = require \"./pixie\"\n\n    module.exports = ->\n      renderer = Renderer\n        width: width\n        height: height\n\n      tool = require(\"./tools\").pan\n\n      [\"touch\", \"move\", \"release\"].forEach (event) ->\n        renderer.on event, (point) ->\n          tool[event]?(\n            renderer: renderer\n            point: Point(point)\n          )\n\n      world = World()\n\n      console.log world.neighbors(Point(5, 5))\n\n      setInterval ->\n        world.tick()\n        renderer.render\n          characters: world.characters()\n          terrain: world.terrain()\n      , 1/60\n\n      return renderer.element()\n",
+      "mode": "100644",
+      "type": "blob"
+    },
+    "lib/graph.coffee.md": {
+      "path": "lib/graph.coffee.md",
+      "content": "Graph Search\n============\n\n    PriorityQueue = require \"priority_queue\"\n\n    module.exports =\n\nA* Pathfinding\n\nReturn a path from initial to goal or `undefined` if no path exists.\n\nInitial and goal are assumed to be nodes that have a toString function that\nuniquely identifies nodes.\n\n      aStar: ({initial, goal, heuristic, neighbors, equals}) ->\n        heuristic ?= -> 0\n        neighbors ?= -> []\n        equals ?= (a, b) ->\n          a.toString() == b.toString()\n\n        # Prevent hanging by capping max iterations\n        iterations = 0\n        iterationsMax = 1000\n\n        # Table to track our node meta-data\n        # TODO: Need to add unique map key function for Points, etc.\n        nodes = new Map\n\n        openSet = PriorityQueue\n          low: true\n\n        push = (node, current, distance=1) ->\n          if previousNode = nodes.get(node)\n            {g, h} = previousNode\n\n          g ?= Infinity\n          h ?= heuristic(node, goal)\n\n          currentG = nodes.get(current)?.g ? 0\n\n          nodeData =\n            g: currentG + distance\n            h: h\n            parent: current\n            node: node\n\n          # Update if better\n          if nodeData.g < g\n            nodes.set(node, nodeData)\n            openSet.push node, nodeData.g + h\n\n        getPath = (node) ->\n          path = [node]\n\n          while (node = nodes.get(node).parent) != null\n            path.push node\n\n          return path.reverse()\n\n        push initial, null, 0\n\n        while openSet.size() > 0\n          return if iterations >= iterationsMax\n          iterations += 1\n\n          current = openSet.pop()\n\n          if equals current, goal\n            return getPath(goal)\n\n          neighbors(current).forEach ([node, distance]) ->\n            push node, current, distance\n\nFind all the nodes accessible within the given distance.\n\n      accessible: ({initial, neighbors, distanceMax, key}) ->\n        neighbors ?= -> []\n        distanceMax ?= 1\n        key ?= (node) ->\n          \"#{node}\"\n\n        get = (node) ->\n          nodes.get key node\n\n        set = (node, value) ->\n          nodes.set key(node), value\n\n        # Table to track our node meta-data\n        nodes = new Map\n\n        openSet = PriorityQueue\n          low: true\n\n        push = (node, current, distance=1) ->\n          g = get(node)?.g ? Infinity\n\n          nodeData =\n            g: (get(current)?.g ? 0) + distance\n            node: node\n\n          # Update if better\n          if nodeData.g < g and nodeData.g <= distanceMax\n            set(node, nodeData)\n            openSet.push node, nodeData.g\n\n        push initial, null, 0\n\n        while openSet.size() > 0\n          current = openSet.pop()\n\n          neighbors(current).forEach ([node, distance]) ->\n            push node, current, distance\n\n        Array.from nodes.values()\n",
+      "mode": "100644",
+      "type": "blob"
+    },
+    "main.coffee.md": {
+      "path": "main.coffee.md",
+      "content": "Mt. Volcanolegends\n==================\n\n    require \"cornerstone\"\n    require \"./util\"\n\n    style = document.createElement \"style\"\n    style.innerText = require \"./style\"\n\n    document.head.appendChild style\n\n    Game = require \"./game\"\n    document.body.appendChild Game()\n",
+      "mode": "100644",
+      "type": "blob"
+    },
     "package.json": {
       "path": "package.json",
       "content": "{\n  \"name\": \"mt-volcanolegends\",\n  \"version\": \"0.0.0\",\n  \"description\": \"Mount Volcanolegends\",\n  \"main\": \"build/server/main.js\",\n  \"scripts\": {\n    \"test\": \"echo \\\"Error: no test specified\\\" && exit 1\",\n    \"start\": \"node build/server/main.js\"\n  },\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git://github.com/STRd6/mt-volcanolegends.git\"\n  },\n  \"author\": \"\",\n  \"license\": \"MIT\",\n  \"bugs\": {\n    \"url\": \"https://github.com/STRd6/mt-volcanolegends/issues\"\n  },\n  \"homepage\": \"https://github.com/STRd6/mt-volcanolegends\"\n}\n",
+      "mode": "100644",
+      "type": "blob"
+    },
+    "pixie.cson": {
+      "path": "pixie.cson",
+      "content": "dependencies:\n  cornerstone: \"distri/cornerstone:v0.2.8\"\n  priority_queue: \"STRd6/priority_queue:v2.0.0\"\n  \"touch-canvas\": \"distri/touch-canvas:v0.3.1\"\nremoteDependencies: [\n  \"https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.23.0/es6-shim.min.js\"\n]\nwidth: 1024\nheight: 576\n",
+      "mode": "100644",
+      "type": "blob"
+    },
+    "renderer.coffee.md": {
+      "path": "renderer.coffee.md",
+      "content": "Renderer\n========\n\n    TouchCanvas = require \"touch-canvas\"\n\n    colors = [\"tan\", \"#444\"]\n\n    tileSize = 16\n\n    module.exports = (I) ->\n      self = TouchCanvas(I)\n\n      I.pan = Point I.pan\n\n      self.attrAccessor \"pan\"\n\n      self.extend\n        drawCharacter: (character) ->\n          {x, y} = character.position().add(0.5, 0.5).scale(tileSize)\n\n          self.drawCircle\n            x: x\n            y: y\n            radius: tileSize/2\n            color: \"blue\"\n\n        drawTile: (tile, x, y) ->\n          self.drawRect\n            x: x * tileSize\n            y: y * tileSize\n            width: tileSize\n            height: tileSize\n            color: colors[tile]\n\n        render: ({terrain, characters}) ->\n          self.fill \"#000\"\n          {x, y} = self.pan()\n          self.withTransform Matrix.translation(x, y), ->\n            terrain.forEach (row, y) ->\n              row.forEach (tile, x) ->\n                self.drawTile tile, x, y\n\n            characters.forEach self.drawCharacter\n\n      return self\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -196,87 +232,73 @@
       "mode": "100755",
       "type": "blob"
     },
+    "selection.coffee.md": {
+      "path": "selection.coffee.md",
+      "content": "Selection\n=========\n\n    module.exports = (I, self) ->\n      initial = null\n\n      self.on \"touch\", (point) ->\n        initial = point\n\n      self.on \"release\", (point) ->\n        if initial\n          self.trigger \"selection\", initial, point\n\n        initial = null\n",
+      "mode": "100644",
+      "type": "blob"
+    },
     "source/server/main.coffee": {
       "path": "source/server/main.coffee",
       "content": "console.log \"hello\"\n",
       "mode": "100644",
       "type": "blob"
     },
-    "main.coffee.md": {
-      "path": "main.coffee.md",
-      "content": "Mt. Volcanolegends\n==================\n\n    require \"cornerstone\"\n    require \"./util\"\n\n    style = document.createElement \"style\"\n    style.innerText = require \"./style\"\n\n    document.head.appendChild style\n\n    Game = require \"./game\"\n    document.body.appendChild Game()\n",
-      "mode": "100644"
-    },
-    "pixie.cson": {
-      "path": "pixie.cson",
-      "content": "dependencies:\n  cornerstone: \"distri/cornerstone:v0.2.8\"\n  priority_queue: \"STRd6/priority_queue:v2.0.0\"\n  \"touch-canvas\": \"distri/touch-canvas:v0.3.1\"\nremoteDependencies: [\n  \"https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.23.0/es6-shim.min.js\"\n]\nwidth: 1024\nheight: 576\n",
-      "mode": "100644"
-    },
-    "renderer.coffee.md": {
-      "path": "renderer.coffee.md",
-      "content": "Renderer\n========\n\n    TouchCanvas = require \"touch-canvas\"\n\n    colors = [\"tan\", \"#444\"]\n\n    tileSize = 16\n\n    module.exports = (I) ->\n      self = TouchCanvas(I)\n\n      I.pan = Point I.pan\n\n      self.attrAccessor \"pan\"\n\n      self.extend\n        drawCharacter: (character) ->\n          {x, y} = character.position().add(0.5, 0.5).scale(tileSize)\n\n          self.drawCircle\n            x: x\n            y: y\n            radius: tileSize/2\n            color: \"blue\"\n\n        drawTile: (tile, x, y) ->\n          self.drawRect\n            x: x * tileSize\n            y: y * tileSize\n            width: tileSize\n            height: tileSize\n            color: colors[tile]\n\n        render: ({terrain, characters}) ->\n          self.fill \"#000\"\n          {x, y} = self.pan()\n          self.withTransform Matrix.translation(x, y), ->\n            terrain.forEach (row, y) ->\n              row.forEach (tile, x) ->\n                self.drawTile tile, x, y\n\n            characters.forEach self.drawCharacter\n\n      return self\n",
-      "mode": "100644"
-    },
-    "world.coffee.md": {
-      "path": "world.coffee.md",
-      "content": "World\n=====\n\n    require \"cornerstone\"\n    Character = require \"./character\"\n    Graph = require \"./lib/graph\"\n\n    module.exports = (I={}) ->\n      defaults I,\n        width: 256\n        height: 256\n\n      I.terrain = [0...I.height].map ->\n        [0...I.width].map ->\n          Math.round rand()\n\n      characters = [\n        Character()\n      ]\n\n      neighbors: (p) ->\n        [-1, 0, 1].map (y) ->\n          [-1, 0, 1].map (x) ->\n            [p.add(x, y), Math.sqrt(x * x + y * y)]\n        .flatten()\n\n      accessible: (start, distance) ->\n        Graph.accessible\n          initial: start\n          neighbors: self.neighbors\n          distanceMax: 50\n\n      select: (start, end) ->\n        log start, end\n\n      characters: ->\n        characters\n\n      tick: ->\n        # Pathfind for characters\n        characters.first()\n\n      terrain: ->\n        I.terrain\n",
-      "mode": "100644"
-    },
-    "game.coffee.md": {
-      "path": "game.coffee.md",
-      "content": "Game\n====\n\n    Renderer = require(\"./renderer\")\n    World = require(\"./world\")\n\n    {width, height} = require \"./pixie\"\n\n    module.exports = ->\n      renderer = Renderer\n        width: width\n        height: height\n\n      tool = require(\"./tools\").pan\n\n      [\"touch\", \"move\", \"release\"].forEach (event) ->\n        renderer.on event, (point) ->\n          tool[event]?(\n            renderer: renderer\n            point: Point(point)\n          )\n\n      world = World()\n      \n      console.log world.neighbors(Point(5, 5))\n\n      setInterval ->\n        world.tick()\n        renderer.render\n          characters: world.characters()\n          terrain: world.terrain()\n      , 1/60\n\n      return renderer.element()\n",
-      "mode": "100644"
-    },
-    "util.coffee": {
-      "path": "util.coffee",
-      "content": "global.log = (args...) ->\n  console.log args...\n",
-      "mode": "100644"
-    },
-    "selection.coffee.md": {
-      "path": "selection.coffee.md",
-      "content": "Selection\n=========\n\n    module.exports = (I, self) ->\n      initial = null\n\n      self.on \"touch\", (point) ->\n        initial = point\n\n      self.on \"release\", (point) ->\n        if initial\n          self.trigger \"selection\", initial, point\n\n        initial = null\n",
-      "mode": "100644"
-    },
     "style.styl": {
       "path": "style.styl",
       "content": "*\n  box-sizing: border-box\n\nhtml, body\n  height: 100%\n\nbody\n  font-family: \"HelveticaNeue-Light\", \"Helvetica Neue Light\", \"Helvetica Neue\", Helvetica, Arial, \"Lucida Grande\", sans-serif\n  font-weight: 300\n  color: #444\n  margin: 0\n  overflow: hidden\n",
-      "mode": "100644"
-    },
-    "tools.coffee.md": {
-      "path": "tools.coffee.md",
-      "content": "Tools\n=====\n\n    module.exports =\n      pan: do ->\n        initial = initialPan = null\n        touch: ({renderer, point}) ->\n          initial = point\n          initialPan = renderer.pan()\n        move: ({renderer, point}) ->\n          delta = point.subtract(initial)\n          p = Point delta.x * renderer.width(), delta.y * renderer.height()\n          renderer.pan initialPan.add p\n",
-      "mode": "100644"
-    },
-    "character.coffee.md": {
-      "path": "character.coffee.md",
-      "content": "Character\n=========\n\nThis is a dwarf-like guy who walks around and digs stuff.\n\n    module.exports = (I={}, self=Model(I)) ->\n      defaults I,\n        position: Point(0, 0)\n\n      self.attrAccessor \"position\"\n\n      return self\n",
-      "mode": "100644"
-    },
-    "lib/graph.coffee.md": {
-      "path": "lib/graph.coffee.md",
-      "content": "Graph Search\n============\n\n    PriorityQueue = require \"priority_queue\"\n\n    module.exports =\n\nA* Pathfinding\n\nReturn a path from initial to goal or `undefined` if no path exists.\n\nInitial and goal are assumed to be nodes that have a toString function that\nuniquely identifies nodes.\n\n      aStar: ({initial, goal, heuristic, neighbors, equals}) ->\n        heuristic ?= -> 0\n        neighbors ?= -> []\n        equals ?= (a, b) ->\n          a.toString() == b.toString()\n\n        # Prevent hanging by capping max iterations\n        iterations = 0\n        iterationsMax = 1000\n\n        # Table to track our node meta-data\n        nodes = new Map\n\n        openSet = PriorityQueue\n          low: true\n\n        push = (node, current, distance=1) ->\n          if previousNode = nodes.get(node)\n            {g, h} = previousNode\n\n          g ?= Infinity\n          h ?= heuristic(node, goal)\n\n          currentG = nodes.get(current)?.g ? 0\n\n          nodeData =\n            g: currentG + distance\n            h: h\n            parent: current\n            node: node\n\n          # Update if better\n          if nodeData.g < g\n            nodes.set(node, nodeData)\n            openSet.push node, nodeData.g + h\n\n        getPath = (node) ->\n          path = [node]\n\n          while (node = nodes.get(node).parent) != null\n            path.push node\n\n          return path.reverse()\n\n        push initial, null, 0\n\n        while openSet.size() > 0\n          return if iterations >= iterationsMax\n          iterations += 1\n\n          current = openSet.pop()\n\n          if equals current, goal\n            return getPath(goal)\n\n          neighbors(current).forEach ([node, distance]) ->\n            push node, current, distance\n\nFind all the nodes accessible within the given distance.\n\n      accessible: ({initial, neighbors, distanceMax}) ->\n        neighbors ?= -> []\n        distanceMax ?= 1\n\n        # Table to track our node meta-data\n        nodes = new Map\n\n        openSet = PriorityQueue\n          low: true\n\n        push = (node, current, distance=1) ->\n          g = nodes.get(node)?.g ? Infinity\n\n          nodeData =\n            g: (nodes.get(current)?.g ? 0) + distance\n            node: node\n\n          # Update if better\n          if nodeData.g < g and nodeData.g <= distanceMax\n            nodes.set(node, nodeData)\n            openSet.push node, nodeData.g\n\n        push initial, null, 0\n\n        while openSet.size() > 0\n          current = openSet.pop()\n\n          neighbors(current).forEach ([node, distance]) ->\n            push node, current, distance\n\n        Array.from nodes.values()\n",
-      "mode": "100644"
+      "mode": "100644",
+      "type": "blob"
     },
     "test/a_star.coffee": {
       "path": "test/a_star.coffee",
       "content": "Graph = require \"../lib/graph\"\n\ndescribe \"A*\", ->\n  it \"should find the shortest path between nodes\", ->\n    result = Graph.aStar\n      initial:0\n      goal: 10\n      neighbors: (value) ->\n        [\n          [value - 1, 1]\n          [value + 1, 1]\n        ]\n      heuristic: (node, goal) ->\n        Math.abs(goal - node)\n\n    assert.equal result.length, 11\n\ndescribe \"accessible\", ->\n  it \"should list the node that are accessible within the distance\", ->\n    result = Graph.accessible\n      initial:0\n      distanceMax: 5\n      neighbors: (value) ->\n        [\n          [value - 1, 1]\n          [value + 1, 1]\n        ]\n\n    assert.equal result.length, 11\n",
-      "mode": "100644"
+      "mode": "100644",
+      "type": "blob"
+    },
+    "tools.coffee.md": {
+      "path": "tools.coffee.md",
+      "content": "Tools\n=====\n\n    module.exports =\n      pan: do ->\n        initial = initialPan = null\n        touch: ({renderer, point}) ->\n          initial = point\n          initialPan = renderer.pan()\n        move: ({renderer, point}) ->\n          delta = point.subtract(initial)\n          p = Point delta.x * renderer.width(), delta.y * renderer.height()\n          renderer.pan initialPan.add p\n",
+      "mode": "100644",
+      "type": "blob"
+    },
+    "util.coffee": {
+      "path": "util.coffee",
+      "content": "global.log = (args...) ->\n  console.log args...\n",
+      "mode": "100644",
+      "type": "blob"
+    },
+    "world.coffee.md": {
+      "path": "world.coffee.md",
+      "content": "World\n=====\n\n    require \"cornerstone\"\n    Character = require \"./character\"\n    Graph = require \"./lib/graph\"\n\n    module.exports = (I={}) ->\n      defaults I,\n        width: 256\n        height: 256\n\n      I.terrain = [0...I.height].map ->\n        [0...I.width].map ->\n          Math.round rand()\n\n      characters = [\n        Character()\n      ]\n\n      neighbors: (p) ->\n        [-1, 0, 1].map (y) ->\n          [-1, 0, 1].map (x) ->\n            [p.add(x, y), Math.sqrt(x * x + y * y)]\n        .flatten()\n\n      accessible: (start, distance) ->\n        Graph.accessible\n          initial: start\n          neighbors: self.neighbors\n          distanceMax: distance\n\n      select: (start, end) ->\n        log start, end\n\n      characters: ->\n        characters\n\n      tick: ->\n        # Pathfind for characters\n        characters.first()\n\n      terrain: ->\n        I.terrain\n",
+      "mode": "100644",
+      "type": "blob"
     }
   },
   "distribution": {
-    "package": {
-      "path": "package",
-      "content": "module.exports = {\"name\":\"mt-volcanolegends\",\"version\":\"0.0.0\",\"description\":\"Mount Volcanolegends\",\"main\":\"build/server/main.js\",\"scripts\":{\"test\":\"echo \\\"Error: no test specified\\\" && exit 1\",\"start\":\"node build/server/main.js\"},\"repository\":{\"type\":\"git\",\"url\":\"git://github.com/STRd6/mt-volcanolegends.git\"},\"author\":\"\",\"license\":\"MIT\",\"bugs\":{\"url\":\"https://github.com/STRd6/mt-volcanolegends/issues\"},\"homepage\":\"https://github.com/STRd6/mt-volcanolegends\"};",
+    "character": {
+      "path": "character",
+      "content": "(function() {\n  module.exports = function(I, self) {\n    if (I == null) {\n      I = {};\n    }\n    if (self == null) {\n      self = Model(I);\n    }\n    defaults(I, {\n      position: Point(0, 0)\n    });\n    self.attrAccessor(\"position\");\n    return self;\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
-    "source/server/main": {
-      "path": "source/server/main",
-      "content": "(function() {\n  console.log(\"hello\");\n\n}).call(this);\n",
+    "game": {
+      "path": "game",
+      "content": "(function() {\n  var Renderer, World, height, width, _ref;\n\n  Renderer = require(\"./renderer\");\n\n  World = require(\"./world\");\n\n  _ref = require(\"./pixie\"), width = _ref.width, height = _ref.height;\n\n  module.exports = function() {\n    var renderer, tool, world;\n    renderer = Renderer({\n      width: width,\n      height: height\n    });\n    tool = require(\"./tools\").pan;\n    [\"touch\", \"move\", \"release\"].forEach(function(event) {\n      return renderer.on(event, function(point) {\n        return typeof tool[event] === \"function\" ? tool[event]({\n          renderer: renderer,\n          point: Point(point)\n        }) : void 0;\n      });\n    });\n    world = World();\n    console.log(world.neighbors(Point(5, 5)));\n    setInterval(function() {\n      world.tick();\n      return renderer.render({\n        characters: world.characters(),\n        terrain: world.terrain()\n      });\n    }, 1 / 60);\n    return renderer.element();\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "lib/graph": {
+      "path": "lib/graph",
+      "content": "(function() {\n  var PriorityQueue;\n\n  PriorityQueue = require(\"priority_queue\");\n\n  module.exports = {\n    aStar: function(_arg) {\n      var current, equals, getPath, goal, heuristic, initial, iterations, iterationsMax, neighbors, nodes, openSet, push;\n      initial = _arg.initial, goal = _arg.goal, heuristic = _arg.heuristic, neighbors = _arg.neighbors, equals = _arg.equals;\n      if (heuristic == null) {\n        heuristic = function() {\n          return 0;\n        };\n      }\n      if (neighbors == null) {\n        neighbors = function() {\n          return [];\n        };\n      }\n      if (equals == null) {\n        equals = function(a, b) {\n          return a.toString() === b.toString();\n        };\n      }\n      iterations = 0;\n      iterationsMax = 1000;\n      nodes = new Map;\n      openSet = PriorityQueue({\n        low: true\n      });\n      push = function(node, current, distance) {\n        var currentG, g, h, nodeData, previousNode, _ref, _ref1;\n        if (distance == null) {\n          distance = 1;\n        }\n        if (previousNode = nodes.get(node)) {\n          g = previousNode.g, h = previousNode.h;\n        }\n        if (g == null) {\n          g = Infinity;\n        }\n        if (h == null) {\n          h = heuristic(node, goal);\n        }\n        currentG = (_ref = (_ref1 = nodes.get(current)) != null ? _ref1.g : void 0) != null ? _ref : 0;\n        nodeData = {\n          g: currentG + distance,\n          h: h,\n          parent: current,\n          node: node\n        };\n        if (nodeData.g < g) {\n          nodes.set(node, nodeData);\n          return openSet.push(node, nodeData.g + h);\n        }\n      };\n      getPath = function(node) {\n        var path;\n        path = [node];\n        while ((node = nodes.get(node).parent) !== null) {\n          path.push(node);\n        }\n        return path.reverse();\n      };\n      push(initial, null, 0);\n      while (openSet.size() > 0) {\n        if (iterations >= iterationsMax) {\n          return;\n        }\n        iterations += 1;\n        current = openSet.pop();\n        if (equals(current, goal)) {\n          return getPath(goal);\n        }\n        neighbors(current).forEach(function(_arg1) {\n          var distance, node;\n          node = _arg1[0], distance = _arg1[1];\n          return push(node, current, distance);\n        });\n      }\n    },\n    accessible: function(_arg) {\n      var current, distanceMax, get, initial, key, neighbors, nodes, openSet, push, set;\n      initial = _arg.initial, neighbors = _arg.neighbors, distanceMax = _arg.distanceMax, key = _arg.key;\n      if (neighbors == null) {\n        neighbors = function() {\n          return [];\n        };\n      }\n      if (distanceMax == null) {\n        distanceMax = 1;\n      }\n      if (key == null) {\n        key = function(node) {\n          return \"\" + node;\n        };\n      }\n      get = function(node) {\n        return nodes.get(key(node));\n      };\n      set = function(node, value) {\n        return nodes.set(key(node), value);\n      };\n      nodes = new Map;\n      openSet = PriorityQueue({\n        low: true\n      });\n      push = function(node, current, distance) {\n        var g, nodeData, _ref, _ref1, _ref2, _ref3;\n        if (distance == null) {\n          distance = 1;\n        }\n        g = (_ref = (_ref1 = get(node)) != null ? _ref1.g : void 0) != null ? _ref : Infinity;\n        nodeData = {\n          g: ((_ref2 = (_ref3 = get(current)) != null ? _ref3.g : void 0) != null ? _ref2 : 0) + distance,\n          node: node\n        };\n        if (nodeData.g < g && nodeData.g <= distanceMax) {\n          set(node, nodeData);\n          return openSet.push(node, nodeData.g);\n        }\n      };\n      push(initial, null, 0);\n      while (openSet.size() > 0) {\n        current = openSet.pop();\n        neighbors(current).forEach(function(_arg1) {\n          var distance, node;\n          node = _arg1[0], distance = _arg1[1];\n          return push(node, current, distance);\n        });\n      }\n      return Array.from(nodes.values());\n    }\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "main": {
       "path": "main",
       "content": "(function() {\n  var Game, style;\n\n  require(\"cornerstone\");\n\n  require(\"./util\");\n\n  style = document.createElement(\"style\");\n\n  style.innerText = require(\"./style\");\n\n  document.head.appendChild(style);\n\n  Game = require(\"./game\");\n\n  document.body.appendChild(Game());\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "package": {
+      "path": "package",
+      "content": "module.exports = {\"name\":\"mt-volcanolegends\",\"version\":\"0.0.0\",\"description\":\"Mount Volcanolegends\",\"main\":\"build/server/main.js\",\"scripts\":{\"test\":\"echo \\\"Error: no test specified\\\" && exit 1\",\"start\":\"node build/server/main.js\"},\"repository\":{\"type\":\"git\",\"url\":\"git://github.com/STRd6/mt-volcanolegends.git\"},\"author\":\"\",\"license\":\"MIT\",\"bugs\":{\"url\":\"https://github.com/STRd6/mt-volcanolegends/issues\"},\"homepage\":\"https://github.com/STRd6/mt-volcanolegends\"};",
       "type": "blob"
     },
     "pixie": {
@@ -289,24 +311,14 @@
       "content": "(function() {\n  var TouchCanvas, colors, tileSize;\n\n  TouchCanvas = require(\"touch-canvas\");\n\n  colors = [\"tan\", \"#444\"];\n\n  tileSize = 16;\n\n  module.exports = function(I) {\n    var self;\n    self = TouchCanvas(I);\n    I.pan = Point(I.pan);\n    self.attrAccessor(\"pan\");\n    self.extend({\n      drawCharacter: function(character) {\n        var x, y, _ref;\n        _ref = character.position().add(0.5, 0.5).scale(tileSize), x = _ref.x, y = _ref.y;\n        return self.drawCircle({\n          x: x,\n          y: y,\n          radius: tileSize / 2,\n          color: \"blue\"\n        });\n      },\n      drawTile: function(tile, x, y) {\n        return self.drawRect({\n          x: x * tileSize,\n          y: y * tileSize,\n          width: tileSize,\n          height: tileSize,\n          color: colors[tile]\n        });\n      },\n      render: function(_arg) {\n        var characters, terrain, x, y, _ref;\n        terrain = _arg.terrain, characters = _arg.characters;\n        self.fill(\"#000\");\n        _ref = self.pan(), x = _ref.x, y = _ref.y;\n        return self.withTransform(Matrix.translation(x, y), function() {\n          terrain.forEach(function(row, y) {\n            return row.forEach(function(tile, x) {\n              return self.drawTile(tile, x, y);\n            });\n          });\n          return characters.forEach(self.drawCharacter);\n        });\n      }\n    });\n    return self;\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
-    "world": {
-      "path": "world",
-      "content": "(function() {\n  var Character, Graph;\n\n  require(\"cornerstone\");\n\n  Character = require(\"./character\");\n\n  Graph = require(\"./lib/graph\");\n\n  module.exports = function(I) {\n    var characters, _i, _ref, _results;\n    if (I == null) {\n      I = {};\n    }\n    defaults(I, {\n      width: 256,\n      height: 256\n    });\n    I.terrain = (function() {\n      _results = [];\n      for (var _i = 0, _ref = I.height; 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }\n      return _results;\n    }).apply(this).map(function() {\n      var _i, _ref, _results;\n      return (function() {\n        _results = [];\n        for (var _i = 0, _ref = I.width; 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }\n        return _results;\n      }).apply(this).map(function() {\n        return Math.round(rand());\n      });\n    });\n    characters = [Character()];\n    return {\n      neighbors: function(p) {\n        return [-1, 0, 1].map(function(y) {\n          return [-1, 0, 1].map(function(x) {\n            return [p.add(x, y), Math.sqrt(x * x + y * y)];\n          });\n        }).flatten();\n      },\n      accessible: function(start, distance) {\n        return Graph.accessible({\n          initial: start,\n          neighbors: self.neighbors,\n          distanceMax: 50\n        });\n      },\n      select: function(start, end) {\n        return log(start, end);\n      },\n      characters: function() {\n        return characters;\n      },\n      tick: function() {\n        return characters.first();\n      },\n      terrain: function() {\n        return I.terrain;\n      }\n    };\n  };\n\n}).call(this);\n",
-      "type": "blob"
-    },
-    "game": {
-      "path": "game",
-      "content": "(function() {\n  var Renderer, World, height, width, _ref;\n\n  Renderer = require(\"./renderer\");\n\n  World = require(\"./world\");\n\n  _ref = require(\"./pixie\"), width = _ref.width, height = _ref.height;\n\n  module.exports = function() {\n    var renderer, tool, world;\n    renderer = Renderer({\n      width: width,\n      height: height\n    });\n    tool = require(\"./tools\").pan;\n    [\"touch\", \"move\", \"release\"].forEach(function(event) {\n      return renderer.on(event, function(point) {\n        return typeof tool[event] === \"function\" ? tool[event]({\n          renderer: renderer,\n          point: Point(point)\n        }) : void 0;\n      });\n    });\n    world = World();\n    console.log(world.neighbors(Point(5, 5)));\n    setInterval(function() {\n      world.tick();\n      return renderer.render({\n        characters: world.characters(),\n        terrain: world.terrain()\n      });\n    }, 1 / 60);\n    return renderer.element();\n  };\n\n}).call(this);\n",
-      "type": "blob"
-    },
-    "util": {
-      "path": "util",
-      "content": "(function() {\n  var __slice = [].slice;\n\n  global.log = function() {\n    var args;\n    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];\n    return console.log.apply(console, args);\n  };\n\n}).call(this);\n",
-      "type": "blob"
-    },
     "selection": {
       "path": "selection",
       "content": "(function() {\n  module.exports = function(I, self) {\n    var initial;\n    initial = null;\n    self.on(\"touch\", function(point) {\n      return initial = point;\n    });\n    return self.on(\"release\", function(point) {\n      if (initial) {\n        self.trigger(\"selection\", initial, point);\n      }\n      return initial = null;\n    });\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "source/server/main": {
+      "path": "source/server/main",
+      "content": "(function() {\n  console.log(\"hello\");\n\n}).call(this);\n",
       "type": "blob"
     },
     "style": {
@@ -314,24 +326,24 @@
       "content": "module.exports = \"* {\\n  -ms-box-sizing: border-box;\\n  -moz-box-sizing: border-box;\\n  -webkit-box-sizing: border-box;\\n  box-sizing: border-box;\\n}\\n\\nhtml,\\nbody {\\n  height: 100%;\\n}\\n\\nbody {\\n  font-family: \\\"HelveticaNeue-Light\\\", \\\"Helvetica Neue Light\\\", \\\"Helvetica Neue\\\", Helvetica, Arial, \\\"Lucida Grande\\\", sans-serif;\\n  font-weight: 300;\\n  color: #444;\\n  margin: 0;\\n  overflow: hidden;\\n}\";",
       "type": "blob"
     },
+    "test/a_star": {
+      "path": "test/a_star",
+      "content": "(function() {\n  var Graph;\n\n  Graph = require(\"../lib/graph\");\n\n  describe(\"A*\", function() {\n    return it(\"should find the shortest path between nodes\", function() {\n      var result;\n      result = Graph.aStar({\n        initial: 0,\n        goal: 10,\n        neighbors: function(value) {\n          return [[value - 1, 1], [value + 1, 1]];\n        },\n        heuristic: function(node, goal) {\n          return Math.abs(goal - node);\n        }\n      });\n      return assert.equal(result.length, 11);\n    });\n  });\n\n  describe(\"accessible\", function() {\n    return it(\"should list the node that are accessible within the distance\", function() {\n      var result;\n      result = Graph.accessible({\n        initial: 0,\n        distanceMax: 5,\n        neighbors: function(value) {\n          return [[value - 1, 1], [value + 1, 1]];\n        }\n      });\n      return assert.equal(result.length, 11);\n    });\n  });\n\n}).call(this);\n",
+      "type": "blob"
+    },
     "tools": {
       "path": "tools",
       "content": "(function() {\n  module.exports = {\n    pan: (function() {\n      var initial, initialPan;\n      initial = initialPan = null;\n      return {\n        touch: function(_arg) {\n          var point, renderer;\n          renderer = _arg.renderer, point = _arg.point;\n          initial = point;\n          return initialPan = renderer.pan();\n        },\n        move: function(_arg) {\n          var delta, p, point, renderer;\n          renderer = _arg.renderer, point = _arg.point;\n          delta = point.subtract(initial);\n          p = Point(delta.x * renderer.width(), delta.y * renderer.height());\n          return renderer.pan(initialPan.add(p));\n        }\n      };\n    })()\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
-    "character": {
-      "path": "character",
-      "content": "(function() {\n  module.exports = function(I, self) {\n    if (I == null) {\n      I = {};\n    }\n    if (self == null) {\n      self = Model(I);\n    }\n    defaults(I, {\n      position: Point(0, 0)\n    });\n    self.attrAccessor(\"position\");\n    return self;\n  };\n\n}).call(this);\n",
+    "util": {
+      "path": "util",
+      "content": "(function() {\n  var __slice = [].slice;\n\n  global.log = function() {\n    var args;\n    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];\n    return console.log.apply(console, args);\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
-    "lib/graph": {
-      "path": "lib/graph",
-      "content": "(function() {\n  var PriorityQueue;\n\n  PriorityQueue = require(\"priority_queue\");\n\n  module.exports = {\n    aStar: function(_arg) {\n      var current, equals, getPath, goal, heuristic, initial, iterations, iterationsMax, neighbors, nodes, openSet, push;\n      initial = _arg.initial, goal = _arg.goal, heuristic = _arg.heuristic, neighbors = _arg.neighbors, equals = _arg.equals;\n      if (heuristic == null) {\n        heuristic = function() {\n          return 0;\n        };\n      }\n      if (neighbors == null) {\n        neighbors = function() {\n          return [];\n        };\n      }\n      if (equals == null) {\n        equals = function(a, b) {\n          return a.toString() === b.toString();\n        };\n      }\n      iterations = 0;\n      iterationsMax = 1000;\n      nodes = new Map;\n      openSet = PriorityQueue({\n        low: true\n      });\n      push = function(node, current, distance) {\n        var currentG, g, h, nodeData, previousNode, _ref, _ref1;\n        if (distance == null) {\n          distance = 1;\n        }\n        if (previousNode = nodes.get(node)) {\n          g = previousNode.g, h = previousNode.h;\n        }\n        if (g == null) {\n          g = Infinity;\n        }\n        if (h == null) {\n          h = heuristic(node, goal);\n        }\n        currentG = (_ref = (_ref1 = nodes.get(current)) != null ? _ref1.g : void 0) != null ? _ref : 0;\n        nodeData = {\n          g: currentG + distance,\n          h: h,\n          parent: current,\n          node: node\n        };\n        if (nodeData.g < g) {\n          nodes.set(node, nodeData);\n          return openSet.push(node, nodeData.g + h);\n        }\n      };\n      getPath = function(node) {\n        var path;\n        path = [node];\n        while ((node = nodes.get(node).parent) !== null) {\n          path.push(node);\n        }\n        return path.reverse();\n      };\n      push(initial, null, 0);\n      while (openSet.size() > 0) {\n        if (iterations >= iterationsMax) {\n          return;\n        }\n        iterations += 1;\n        current = openSet.pop();\n        if (equals(current, goal)) {\n          return getPath(goal);\n        }\n        neighbors(current).forEach(function(_arg1) {\n          var distance, node;\n          node = _arg1[0], distance = _arg1[1];\n          return push(node, current, distance);\n        });\n      }\n    },\n    accessible: function(_arg) {\n      var current, distanceMax, initial, neighbors, nodes, openSet, push;\n      initial = _arg.initial, neighbors = _arg.neighbors, distanceMax = _arg.distanceMax;\n      if (neighbors == null) {\n        neighbors = function() {\n          return [];\n        };\n      }\n      if (distanceMax == null) {\n        distanceMax = 1;\n      }\n      nodes = new Map;\n      openSet = PriorityQueue({\n        low: true\n      });\n      push = function(node, current, distance) {\n        var g, nodeData, _ref, _ref1, _ref2, _ref3;\n        if (distance == null) {\n          distance = 1;\n        }\n        g = (_ref = (_ref1 = nodes.get(node)) != null ? _ref1.g : void 0) != null ? _ref : Infinity;\n        nodeData = {\n          g: ((_ref2 = (_ref3 = nodes.get(current)) != null ? _ref3.g : void 0) != null ? _ref2 : 0) + distance,\n          node: node\n        };\n        if (nodeData.g < g && nodeData.g <= distanceMax) {\n          nodes.set(node, nodeData);\n          return openSet.push(node, nodeData.g);\n        }\n      };\n      push(initial, null, 0);\n      while (openSet.size() > 0) {\n        current = openSet.pop();\n        neighbors(current).forEach(function(_arg1) {\n          var distance, node;\n          node = _arg1[0], distance = _arg1[1];\n          return push(node, current, distance);\n        });\n      }\n      return Array.from(nodes.values());\n    }\n  };\n\n}).call(this);\n",
-      "type": "blob"
-    },
-    "test/a_star": {
-      "path": "test/a_star",
-      "content": "(function() {\n  var Graph;\n\n  Graph = require(\"../lib/graph\");\n\n  describe(\"A*\", function() {\n    return it(\"should find the shortest path between nodes\", function() {\n      var result;\n      result = Graph.aStar({\n        initial: 0,\n        goal: 10,\n        neighbors: function(value) {\n          return [[value - 1, 1], [value + 1, 1]];\n        },\n        heuristic: function(node, goal) {\n          return Math.abs(goal - node);\n        }\n      });\n      return assert.equal(result.length, 11);\n    });\n  });\n\n  describe(\"accessible\", function() {\n    return it(\"should list the node that are accessible within the distance\", function() {\n      var result;\n      result = Graph.accessible({\n        initial: 0,\n        distanceMax: 5,\n        neighbors: function(value) {\n          return [[value - 1, 1], [value + 1, 1]];\n        }\n      });\n      return assert.equal(result.length, 11);\n    });\n  });\n\n}).call(this);\n",
+    "world": {
+      "path": "world",
+      "content": "(function() {\n  var Character, Graph;\n\n  require(\"cornerstone\");\n\n  Character = require(\"./character\");\n\n  Graph = require(\"./lib/graph\");\n\n  module.exports = function(I) {\n    var characters, _i, _ref, _results;\n    if (I == null) {\n      I = {};\n    }\n    defaults(I, {\n      width: 256,\n      height: 256\n    });\n    I.terrain = (function() {\n      _results = [];\n      for (var _i = 0, _ref = I.height; 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }\n      return _results;\n    }).apply(this).map(function() {\n      var _i, _ref, _results;\n      return (function() {\n        _results = [];\n        for (var _i = 0, _ref = I.width; 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }\n        return _results;\n      }).apply(this).map(function() {\n        return Math.round(rand());\n      });\n    });\n    characters = [Character()];\n    return {\n      neighbors: function(p) {\n        return [-1, 0, 1].map(function(y) {\n          return [-1, 0, 1].map(function(x) {\n            return [p.add(x, y), Math.sqrt(x * x + y * y)];\n          });\n        }).flatten();\n      },\n      accessible: function(start, distance) {\n        return Graph.accessible({\n          initial: start,\n          neighbors: self.neighbors,\n          distanceMax: distance\n        });\n      },\n      select: function(start, end) {\n        return log(start, end);\n      },\n      characters: function() {\n        return characters;\n      },\n      tick: function() {\n        return characters.first();\n      },\n      terrain: function() {\n        return I.terrain;\n      }\n    };\n  };\n\n}).call(this);\n",
       "type": "blob"
     }
   },

@@ -63,6 +63,7 @@ uniquely identifies nodes.</p>
     iterationsMax = <span class="number">1000</span>
 
     <span class="comment"># Table to track our node meta-data</span>
+    <span class="comment"># TODO: Need to add unique map key function for Points, etc.</span>
     nodes = <span class="keyword">new</span> Map
 
     openSet = PriorityQueue
@@ -121,9 +122,17 @@ uniquely identifies nodes.</p>
               <p>Find all the nodes accessible within the given distance.</p>
 
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">  accessible: ({initial, neighbors, distanceMax}) -&gt;
+            <div class="content"><pre><code class="lang-coffeescript">  accessible: ({initial, neighbors, distanceMax, key}) -&gt;
     neighbors ?= -&gt; []
     distanceMax ?= <span class="number">1</span>
+    key ?= (node) -&gt;
+      <span class="string">"<span class="subst">#{node}</span>"</span>
+
+    <span class="function"><span class="title">get</span></span> = (node) -&gt;
+      nodes.get key node
+
+    <span class="function"><span class="title">set</span></span> = (node, value) -&gt;
+      nodes.set key(node), value
 
     <span class="comment"># Table to track our node meta-data</span>
     nodes = <span class="keyword">new</span> Map
@@ -132,15 +141,15 @@ uniquely identifies nodes.</p>
       low: <span class="literal">true</span>
 
     <span class="function"><span class="title">push</span></span> = (node, current, distance=<span class="number">1</span>) -&gt;
-      g = nodes.get(node)?.g ? Infinity
+      g = get(node)?.g ? Infinity
 
       nodeData =
-        g: (nodes.get(current)?.g ? <span class="number">0</span>) + distance
+        g: (get(current)?.g ? <span class="number">0</span>) + distance
         node: node
 
       <span class="comment"># Update if better</span>
       <span class="keyword">if</span> nodeData.g &lt; g <span class="keyword">and</span> nodeData.g &lt;= distanceMax
-        nodes.set(node, nodeData)
+        set(node, nodeData)
         openSet.push node, nodeData.g
 
     push initial, <span class="literal">null</span>, <span class="number">0</span>
