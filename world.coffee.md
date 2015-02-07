@@ -18,27 +18,34 @@ World
         Character()
       ]
 
-      neighbors: (p) ->
-        [-1, 0, 1].map (y) ->
-          [-1, 0, 1].map (x) ->
-            [p.add(x, y), Math.sqrt(x * x + y * y)]
-        .flatten()
-
-      accessible: (start, distance) ->
-        Graph.accessible
-          initial: start
-          neighbors: self.neighbors
-          distanceMax: distance
-
-      select: (start, end) ->
-        log start, end
-
-      characters: ->
-        characters
-
-      tick: ->
-        # Pathfind for characters
-        characters.first()
-
-      terrain: ->
-        I.terrain
+      self =
+        passable: (p) ->
+          I.terrain[p.y]?[p.x] is 0
+  
+        neighbors: (p) ->
+          [-1, 0, 1].map (y) ->
+            [-1, 0, 1].map (x) ->
+              [p.add(x, y), Math.sqrt(x * x + y * y)]
+          .flatten()
+  
+        accessible: (start, distance) ->
+          Graph.accessible
+            initial: start
+            neighbors: (p) ->
+              self.neighbors(p).filter ([point, dist]) ->
+                self.passable(point)
+  
+            distanceMax: distance
+  
+        select: (start, end) ->
+          log start, end
+  
+        characters: ->
+          characters
+  
+        tick: ->
+          # Pathfind for characters
+          characters.first()
+  
+        terrain: ->
+          I.terrain

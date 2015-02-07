@@ -119,4 +119,5 @@ Find all the nodes accessible within the given distance.
           neighbors(current).forEach ([node, distance]) ->
             push node, current, distance
 
-        Array.from nodes.values()
+        Array.from(nodes.values()).map (value) ->
+          value.node

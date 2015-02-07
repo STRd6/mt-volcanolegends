@@ -22,7 +22,7 @@ Game
 
       world = World()
 
-      console.log world.neighbors(Point(5, 5))
+      console.log world.accessible(Point(0, 0), 1)
 
       setInterval ->
         world.tick()
