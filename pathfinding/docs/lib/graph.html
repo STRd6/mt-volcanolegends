@@ -168,7 +168,8 @@ uniquely identifies nodes.</p>
       neighbors(current).forEach ([node, distance]) -&gt;
         push node, current, distance
 
-    Array.from nodes.values()</code></pre>
+    Array.from(nodes.values()).map (value) -&gt;
+      value.node</code></pre>
 </div>
         </li>
         

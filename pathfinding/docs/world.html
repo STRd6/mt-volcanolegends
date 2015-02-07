@@ -51,30 +51,37 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
     Character()
   ]
 
-  neighbors: (p) -&gt;
-    [-<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>].map (y) -&gt;
-      [-<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>].map (x) -&gt;
-        [p.add(x, y), Math.sqrt(x * x + y * y)]
-    .flatten()
+  self =
+    passable: (p) -&gt;
+      I.terrain[p.y]?[p.x] <span class="keyword">is</span> <span class="number">0</span>
 
-  accessible: (start, distance) -&gt;
-    Graph.accessible
-      initial: start
-      neighbors: self.neighbors
-      distanceMax: distance
+    neighbors: (p) -&gt;
+      [-<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>].map (y) -&gt;
+        [-<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>].map (x) -&gt;
+          [p.add(x, y), Math.sqrt(x * x + y * y)]
+      .flatten()
 
-  select: (start, end) -&gt;
-    log start, end
+    accessible: (start, distance) -&gt;
+      Graph.accessible
+        initial: start
+        neighbors: (p) -&gt;
+          self.neighbors(p).filter ([point, dist]) -&gt;
+            self.passable(point)
 
-  characters: -&gt;
-    characters
+        distanceMax: distance
 
-  tick: -&gt;
-    <span class="comment"># Pathfind for characters</span>
-    characters.first()
+    select: (start, end) -&gt;
+      log start, end
 
-  terrain: -&gt;
-    I.terrain</code></pre>
+    characters: -&gt;
+      characters
+
+    tick: -&gt;
+      <span class="comment"># Pathfind for characters</span>
+      characters.first()
+
+    terrain: -&gt;
+      I.terrain</code></pre>
 </div>
         </li>
         
