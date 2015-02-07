@@ -52,31 +52,39 @@ module.exports =</code></pre>
 uniquely identifies nodes.</p>
 
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">  aStar: ({initial, goal, heuristic, neighbors, equals}) -&gt;
+            <div class="content"><pre><code class="lang-coffeescript">  aStar: ({initial, goal, heuristic, neighbors, key}) -&gt;
     heuristic ?= -&gt; <span class="number">0</span>
     neighbors ?= -&gt; []
-    equals ?= (a, b) -&gt;
-      a.toString() == b.toString()
+    key ?= (node) -&gt;
+      <span class="string">"<span class="subst">#{node}</span>"</span>
+
+    <span class="function"><span class="title">equals</span></span> = (a, b) -&gt;
+      key(a) == key(b)
 
     <span class="comment"># Prevent hanging by capping max iterations</span>
     iterations = <span class="number">0</span>
     iterationsMax = <span class="number">1000</span>
 
     <span class="comment"># Table to track our node meta-data</span>
-    <span class="comment"># TODO: Need to add unique map key function for Points, etc.</span>
     nodes = <span class="keyword">new</span> Map
+
+    <span class="function"><span class="title">get</span></span> = (node) -&gt;
+      nodes.get key node
+
+    <span class="function"><span class="title">set</span></span> = (node, value) -&gt;
+      nodes.set key(node), value
 
     openSet = PriorityQueue
       low: <span class="literal">true</span>
 
     <span class="function"><span class="title">push</span></span> = (node, current, distance=<span class="number">1</span>) -&gt;
-      <span class="keyword">if</span> previousNode = nodes.get(node)
+      <span class="keyword">if</span> previousNode = get(node)
         {g, h} = previousNode
 
       g ?= Infinity
       h ?= heuristic(node, goal)
 
-      currentG = nodes.get(current)?.g ? <span class="number">0</span>
+      currentG = get(current)?.g ? <span class="number">0</span>
 
       nodeData =
         g: currentG + distance
@@ -86,16 +94,16 @@ uniquely identifies nodes.</p>
 
       <span class="comment"># Update if better</span>
       <span class="keyword">if</span> nodeData.g &lt; g
-        nodes.set(node, nodeData)
+        set(node, nodeData)
         openSet.push node, nodeData.g + h
 
     <span class="function"><span class="title">getPath</span></span> = (node) -&gt;
       path = [node]
 
-      <span class="keyword">while</span> (node = nodes.get(node).parent) != <span class="literal">null</span>
-        path.push node
+      <span class="keyword">while</span> (node = get(node).parent) != <span class="literal">null</span>
+        path.unshift node
 
-      <span class="keyword">return</span> path.reverse()
+      <span class="keyword">return</span> path
 
     push initial, <span class="literal">null</span>, <span class="number">0</span>
 
