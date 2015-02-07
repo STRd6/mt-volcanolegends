@@ -12,31 +12,39 @@ Return a path from initial to goal or `undefined` if no path exists.
 Initial and goal are assumed to be nodes that have a toString function that
 uniquely identifies nodes.
 
-      aStar: ({initial, goal, heuristic, neighbors, equals}) ->
+      aStar: ({initial, goal, heuristic, neighbors, key}) ->
         heuristic ?= -> 0
         neighbors ?= -> []
-        equals ?= (a, b) ->
-          a.toString() == b.toString()
+        key ?= (node) ->
+          "#{node}"
+
+        equals = (a, b) ->
+          key(a) == key(b)
 
         # Prevent hanging by capping max iterations
         iterations = 0
         iterationsMax = 1000
 
         # Table to track our node meta-data
-        # TODO: Need to add unique map key function for Points, etc.
         nodes = new Map
+
+        get = (node) ->
+          nodes.get key node
+
+        set = (node, value) ->
+          nodes.set key(node), value
 
         openSet = PriorityQueue
           low: true
 
         push = (node, current, distance=1) ->
-          if previousNode = nodes.get(node)
+          if previousNode = get(node)
             {g, h} = previousNode
 
           g ?= Infinity
           h ?= heuristic(node, goal)
 
-          currentG = nodes.get(current)?.g ? 0
+          currentG = get(current)?.g ? 0
 
           nodeData =
             g: currentG + distance
@@ -46,16 +54,16 @@ uniquely identifies nodes.
 
           # Update if better
           if nodeData.g < g
-            nodes.set(node, nodeData)
+            set(node, nodeData)
             openSet.push node, nodeData.g + h
 
         getPath = (node) ->
           path = [node]
 
-          while (node = nodes.get(node).parent) != null
-            path.push node
+          while (node = get(node).parent) != null
+            path.unshift node
 
-          return path.reverse()
+          return path
 
         push initial, null, 0
 
