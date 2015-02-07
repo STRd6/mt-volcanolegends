@@ -18,7 +18,12 @@ World
         Character()
       ]
 
+      accessiblePositions = []
+
       self =
+        accessiblePositions: ->
+          accessiblePositions
+
         passable: (p) ->
           I.terrain[p.y]?[p.x] is 0
   
@@ -42,10 +47,10 @@ World
   
         characters: ->
           characters
-  
+
         tick: ->
           # Pathfind for characters
-          characters.first()
-  
+          accessiblePositions = self.accessible characters.first().position(), 10
+
         terrain: ->
           I.terrain

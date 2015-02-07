@@ -22,13 +22,12 @@ Game
 
       world = World()
 
-      console.log world.accessible(Point(0, 0), 1)
-
       setInterval ->
         world.tick()
         renderer.render
           characters: world.characters()
           terrain: world.terrain()
+          debug: world.accessiblePositions()
       , 1/60
 
       return renderer.element()
