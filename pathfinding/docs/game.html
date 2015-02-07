@@ -55,13 +55,12 @@ module.<span class="function"><span class="title">exports</span></span> = -&gt;
 
   world = World()
 
-  console.log world.accessible(Point(<span class="number">0</span>, <span class="number">0</span>), <span class="number">1</span>)
-
   setInterval -&gt;
     world.tick()
     renderer.render
       characters: world.characters()
       terrain: world.terrain()
+      debug: world.accessiblePositions()
   , <span class="number">1</span>/<span class="number">60</span>
 
   <span class="keyword">return</span> renderer.element()</code></pre>

@@ -51,7 +51,12 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
     Character()
   ]
 
+  accessiblePositions = []
+
   self =
+    accessiblePositions: -&gt;
+      accessiblePositions
+
     passable: (p) -&gt;
       I.terrain[p.y]?[p.x] <span class="keyword">is</span> <span class="number">0</span>
 
@@ -78,7 +83,7 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
 
     tick: -&gt;
       <span class="comment"># Pathfind for characters</span>
-      characters.first()
+      accessiblePositions = self.accessible characters.first().position(), <span class="number">10</span>
 
     terrain: -&gt;
       I.terrain</code></pre>
