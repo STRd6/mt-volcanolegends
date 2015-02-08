@@ -43,7 +43,10 @@
     move: ({renderer, point}) -&gt;
       delta = point.subtract(initial)
       p = Point delta.x * renderer.width(), delta.y * renderer.height()
-      renderer.pan initialPan.add p</code></pre>
+      renderer.pan initialPan.add p
+  designate:
+    release: -&gt;
+      console.log arguments</code></pre>
 </div>
         </li>
         
