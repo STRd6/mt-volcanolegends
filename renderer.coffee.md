@@ -12,7 +12,7 @@ Renderer
 
       I.pan = Point I.pan
 
-      self.attrAccessor "pan"
+      self.attrAccessor "pan" # Pixel coordinates
 
       self.extend
         drawCharacter: (character) ->
@@ -31,6 +31,14 @@ Renderer
             width: tileSize
             height: tileSize
             color: color
+
+        size: ->
+          width: self.width()
+          height: self.height()
+
+        tileSize: ->
+          width: tileSize
+          height: tileSize
 
         render: ({terrain, characters, debug}) ->
           self.fill "#000"
