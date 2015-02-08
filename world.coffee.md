@@ -7,8 +7,8 @@ World
 
     module.exports = (I={}) ->
       defaults I,
-        width: 256
-        height: 256
+        width: 64
+        height: 36
 
       I.terrain = [0...I.height].map ->
         [0...I.width].map ->

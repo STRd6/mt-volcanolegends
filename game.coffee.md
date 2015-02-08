@@ -11,7 +11,7 @@ Game
         width: width
         height: height
 
-      tool = require("./tools").pan
+      tool = require("./tools").designate
 
       ["touch", "move", "release"].forEach (event) ->
         renderer.on event, (point) ->
