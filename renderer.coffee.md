@@ -12,7 +12,7 @@ Renderer
 
       I.pan = Point I.pan
 
-      self.attrAccessor "pan"
+      self.attrAccessor "pan" # Pixel coordinates
 
       self.extend
         drawCharacter: (character) ->
@@ -24,22 +24,32 @@ Renderer
             radius: tileSize/2
             color: "blue"
 
-        drawTile: (tile, x, y) ->
+        drawTile: (x, y, color) ->
           self.drawRect
             x: x * tileSize
             y: y * tileSize
             width: tileSize
             height: tileSize
-            color: colors[tile]
+            color: color
 
-        render: ({terrain, characters}) ->
+        size: ->
+          width: self.width()
+          height: self.height()
+
+        tileSize: ->
+          width: tileSize
+          height: tileSize
+
+        render: ({terrain, characters, debug}) ->
           self.fill "#000"
           {x, y} = self.pan()
           self.withTransform Matrix.translation(x, y), ->
             terrain.forEach (row, y) ->
               row.forEach (tile, x) ->
-                self.drawTile tile, x, y
+                self.drawTile x, y, colors[tile]
 
             characters.forEach self.drawCharacter
+            debug.forEach ({x, y}) ->
+              self.drawTile x, y, "rgba(255, 0, 255, 0.25)"
 
       return self
