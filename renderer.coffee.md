@@ -40,7 +40,7 @@ Renderer
           width: tileSize
           height: tileSize
 
-        render: ({terrain, characters, debug}) ->
+        render: ({terrain, characters, designations, debug}) ->
           self.fill "#000"
           {x, y} = self.pan()
           self.withTransform Matrix.translation(x, y), ->
@@ -51,5 +51,8 @@ Renderer
             characters.forEach self.drawCharacter
             debug.forEach ({x, y}) ->
               self.drawTile x, y, "rgba(255, 0, 255, 0.25)"
+
+            designations.forEach ({x, y}) ->
+              self.drawTile x, y, "rgba(255, 255, 0, 0.25)"
 
       return self

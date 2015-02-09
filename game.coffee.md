@@ -35,7 +35,8 @@ Game
           tool[event]?(
             renderer: renderer
             point: Point(point)
-            world: toWorld Point(point)
+            world: world
+            worldPosition: toWorld Point(point)
           )
 
       world = World()
@@ -44,6 +45,7 @@ Game
         world.tick()
         renderer.render
           characters: world.characters()
+          designations: world.designations()
           terrain: world.terrain()
           debug: world.accessiblePositions()
       , 1/60

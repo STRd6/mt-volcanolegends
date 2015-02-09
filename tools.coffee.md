@@ -12,5 +12,5 @@ Tools
           p = Point delta.x * renderer.width(), delta.y * renderer.height()
           renderer.pan initialPan.add p
       designate:
-        release: ->
-          console.log arguments
+        release: ({world, worldPosition}) ->
+          world.designate worldPosition
