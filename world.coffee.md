@@ -4,6 +4,7 @@ World
     require "cornerstone"
     Character = require "./character"
     Graph = require "./lib/graph"
+    PositionSet = require "./lib/position_set"
 
     module.exports = (I={}) ->
       defaults I,
@@ -20,7 +21,7 @@ World
 
       accessiblePositions = []
 
-      designations = []
+      designations = PositionSet()
 
       self =
         accessiblePositions: ->
@@ -72,10 +73,9 @@ World
           # Process designations
           # TODO: Schedule characters to move around rather than just clearing them
           designations.forEach (p) ->
-            console.log p
             self.set p, 0
 
-          designations = []
+          designations.clear()
 
         terrain: ->
           I.terrain
