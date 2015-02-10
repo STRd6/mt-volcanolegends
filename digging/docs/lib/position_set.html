@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>world</title>
+  <title>lib/position_set</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="http://strd6.github.io/cdn/parallel/docco.css" />
@@ -18,7 +18,7 @@
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h1 id="world">World</h1>
+              <h1 id="position-set">Position Set</h1>
 
             </div>
             <div class="content"><pre><code class="lang-coffeescript">
@@ -32,86 +32,29 @@
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              
+              <p>A set of 2d positions.</p>
+
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">require <span class="string">"cornerstone"</span>
-Character = require <span class="string">"./character"</span>
-Graph = require <span class="string">"./lib/graph"</span>
-PositionSet = require <span class="string">"./lib/position_set"</span>
+            <div class="content"><pre><code class="lang-coffeescript"><span class="function"><span class="title">key</span></span> = ({x, y}) -&gt;
+  <span class="string">"<span class="subst">#{x}</span>,<span class="subst">#{y}</span>"</span>
 
-module.<span class="function"><span class="title">exports</span></span> = (I={}) -&gt;
-  defaults I,
-    width: <span class="number">64</span>
-    height: <span class="number">36</span>
+module.<span class="function"><span class="title">exports</span></span> = -&gt;
+  map = <span class="keyword">new</span> Map
 
-  I.terrain = [<span class="number">0.</span>..I.height].map -&gt;
-    [<span class="number">0.</span>..I.width].map -&gt;
-      Math.round rand()
+  <span class="function"><span class="title">add</span></span> = (point) -&gt;
+    map.set key(point), point
 
-  characters = [
-    Character()
-  ]
+  add: add
+  push: add
 
-  accessiblePositions = []
+  clear: -&gt;
+    map.clear()
 
-  designations = PositionSet()
+  forEach: (fn) -&gt;
+    Array.from(map.values()).forEach fn
 
-  self =
-    accessiblePositions: -&gt;
-      accessiblePositions
-
-    set: ({x, y}, value) -&gt;
-      <span class="keyword">return</span> <span class="keyword">unless</span> <span class="number">0</span> &lt;= y &lt; I.height
-      <span class="keyword">return</span> <span class="keyword">unless</span> <span class="number">0</span> &lt;= x &lt; I.width
-
-      I.terrain[y][x] = value
-
-    get: (p) -&gt;
-      I.terrain[p.y]?[p.x]
-
-    passable: (p) -&gt;
-      self.get(p) <span class="keyword">is</span> <span class="number">0</span>
-
-    designate: (p) -&gt;
-      designations.push p
-
-    designations: -&gt;
-      designations
-
-    neighbors: (p) -&gt;
-      [-<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>].map (y) -&gt;
-        [-<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>].map (x) -&gt;
-          [p.add(x, y), Math.sqrt(x * x + y * y)]
-      .flatten()
-
-    accessible: (start, distance) -&gt;
-      Graph.accessible
-        initial: start
-        neighbors: (p) -&gt;
-          self.neighbors(p).filter ([point, dist]) -&gt;
-            self.passable(point)
-
-        distanceMax: distance
-
-    select: (start, end) -&gt;
-      log start, end
-
-    characters: -&gt;
-      characters
-
-    tick: -&gt;
-      <span class="comment"># Pathfind for characters</span>
-      accessiblePositions = self.accessible characters.first().position(), <span class="number">10</span>
-
-      <span class="comment"># Process designations</span>
-      <span class="comment"># TODO: Schedule characters to move around rather than just clearing them</span>
-      designations.forEach (p) -&gt;
-        self.set p, <span class="number">0</span>
-
-      designations.clear()
-
-    terrain: -&gt;
-      I.terrain</code></pre>
+  remove: (point) -&gt;
+    map.<span class="keyword">delete</span> key(point)</code></pre>
 </div>
         </li>
         
@@ -253,6 +196,6 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
 
 }).call(this);
 
-</script><script src="package.js"></script>
+</script><script src="../package.js"></script>
 </body>
 </html>
