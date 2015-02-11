@@ -28,7 +28,7 @@ Game
         height: height
 
       toScreen = (point) ->
-        point.scale(renderer.size()).add(renderer.pan())
+        point.scale(renderer.size()).subtract(renderer.pan())
       toWorld = (point) ->
         toScreen(point).scale(Size(renderer.tileSize()).inverse()).floor()
 
