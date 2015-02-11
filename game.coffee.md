@@ -10,15 +10,17 @@ Game
 
     module.exports = ->
       register = require("./lib/hotkeys")
-
       tool = TOOLS.designate
 
+      actions = Observable ["designate", "pan"].map (name) ->
+        name: name
+        perform: ->
+          tool = TOOLS[name]
+
       register "0", ->
-        log "yolo"
         tool = TOOLS.pan
 
       register "1", ->
-        log "yolo2"
         tool = TOOLS.designate
 
       renderer = Renderer
@@ -50,4 +52,9 @@ Game
           debug: world.accessiblePositions()
       , 1/60
 
-      return renderer.element()
+      ActionBar = require "action-bar"
+      gameElement = document.createElement "div"
+      gameElement.appendChild renderer.element()
+      gameElement.appendChild ActionBar(actions: actions)
+
+      return gameElement
