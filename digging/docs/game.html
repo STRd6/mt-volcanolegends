@@ -61,7 +61,7 @@ module.<span class="function"><span class="title">exports</span></span> = -&gt;
     height: height
 
   <span class="function"><span class="title">toScreen</span></span> = (point) -&gt;
-    point.scale(renderer.size()).add(renderer.pan())
+    point.scale(renderer.size()).subtract(renderer.pan())
   <span class="function"><span class="title">toWorld</span></span> = (point) -&gt;
     toScreen(point).scale(Size(renderer.tileSize()).inverse()).floor()
 
