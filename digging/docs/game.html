@@ -43,15 +43,17 @@ TOOLS = require(<span class="string">"./tools"</span>)
 
 module.<span class="function"><span class="title">exports</span></span> = -&gt;
   register = require(<span class="string">"./lib/hotkeys"</span>)
-
   tool = TOOLS.designate
 
+  actions = Observable [<span class="string">"designate"</span>, <span class="string">"pan"</span>].map (name) -&gt;
+    name: name
+    perform: -&gt;
+      tool = TOOLS[name]
+
   register <span class="string">"0"</span>, -&gt;
-    log <span class="string">"yolo"</span>
     tool = TOOLS.pan
 
   register <span class="string">"1"</span>, -&gt;
-    log <span class="string">"yolo2"</span>
     tool = TOOLS.designate
 
   renderer = Renderer
@@ -83,7 +85,12 @@ module.<span class="function"><span class="title">exports</span></span> = -&gt;
       debug: world.accessiblePositions()
   , <span class="number">1</span>/<span class="number">60</span>
 
-  <span class="keyword">return</span> renderer.element()</code></pre>
+  ActionBar = require <span class="string">"action-bar"</span>
+  gameElement = document.createElement <span class="string">"div"</span>
+  gameElement.appendChild renderer.element()
+  gameElement.appendChild ActionBar(actions: actions)
+
+  <span class="keyword">return</span> gameElement</code></pre>
 </div>
         </li>
         
