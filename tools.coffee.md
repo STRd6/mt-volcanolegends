@@ -1,18 +1,18 @@
 Tools
 =====
 
-    endDeltoid = (start, end) ->
-      if end.x < start.x
+    rectangleFromSelection = (start, end) ->
+      if end.x > start.x
         x = 0
       else
         x = 1
 
-      if end.y < start.y
+      if end.y > start.y
         y = 0
       else
         y = 1
 
-      end.add(Point(x, y))
+      Rectangle.fromPoints(start.add(Point(x, y)), end)
 
     module.exports =
       pan: do ->
@@ -29,9 +29,6 @@ Tools
         touch: ({worldPosition}) ->
           initialPosition = worldPosition
         move: ({renderer, worldPosition}) ->
-          selectionEnd = endDeltoid(initialPosition, worldPosition)
-          selection = Rectangle.fromPoints(initialPosition, selectionEnd)
-
-          renderer.activeDesignation selection
+          renderer.activeDesignation rectangleFromSelection(initialPosition, worldPosition)
         release: ({world, worldPosition}) ->
           world.designate worldPosition
