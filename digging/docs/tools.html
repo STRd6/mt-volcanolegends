@@ -35,17 +35,19 @@
               
             </div>
             <div class="content"><pre><code class="lang-coffeescript"><span class="function"><span class="title">rectangleFromSelection</span></span> = (start, end) -&gt;
+  p1 = Point(<span class="number">0</span>, <span class="number">0</span>)
+  p2 = Point(<span class="number">0</span>, <span class="number">0</span>)
   <span class="keyword">if</span> end.x &gt; start.x
-    x = <span class="number">0</span>
+    p2.x = <span class="number">1</span>
   <span class="keyword">else</span>
-    x = <span class="number">1</span>
+    p1.x = <span class="number">1</span>
 
   <span class="keyword">if</span> end.y &gt; start.y
-    y = <span class="number">0</span>
+    p2.y = <span class="number">1</span>
   <span class="keyword">else</span>
-    y = <span class="number">1</span>
+    p1.y = <span class="number">1</span>
 
-  Rectangle.fromPoints(start.add(Point(x, y)), end)
+  Rectangle.fromPoints(start.add(p1), end.add(p2))
 
 module.exports =
   pan: <span class="keyword">do</span> -&gt;
@@ -64,7 +66,8 @@ module.exports =
     move: ({renderer, worldPosition}) -&gt;
       renderer.activeDesignation rectangleFromSelection(initialPosition, worldPosition)
     release: ({world, worldPosition}) -&gt;
-      world.designate worldPosition</code></pre>
+      rectangleFromSelection(initialPosition, worldPosition).each (x, y) -&gt;
+        world.designate Point(x, y)</code></pre>
 </div>
         </li>
         
