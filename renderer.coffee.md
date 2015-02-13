@@ -6,6 +6,7 @@ Renderer
     colors = ["tan", "#444"]
 
     tileSize = 16
+    designationColor = "rgba(255, 255, 0, 0.25)"
 
     module.exports = (I) ->
       self = TouchCanvas(I)
@@ -13,6 +14,7 @@ Renderer
       I.pan = Point I.pan
 
       self.attrAccessor "pan" # Pixel coordinates
+      self.attrAccessor "activeDesignation" # World Coordinates
 
       self.extend
         drawCharacter: (character) ->
@@ -53,6 +55,15 @@ Renderer
               self.drawTile x, y, "rgba(255, 0, 255, 0.25)"
 
             designations.forEach ({x, y}) ->
-              self.drawTile x, y, "rgba(255, 255, 0, 0.25)"
+              self.drawTile x, y, designationColor
+
+            if designation = self.activeDesignation()
+              {x, y, width, height} = designation
+              self.drawRect
+                x: x * tileSize
+                y: y * tileSize
+                width: width * tileSize
+                height: height * tileSize
+                color: designationColor
 
       return self

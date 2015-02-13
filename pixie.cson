@@ -3,7 +3,7 @@ remoteDependencies: [
 ]
 dependencies:
   "action-bar": "distri/action-bar:v0.0.1"
-  cornerstone: "distri/cornerstone:v0.2.8"
+  cornerstone: "distri/cornerstone:v0.2.9"
   priority_queue: "STRd6/priority_queue:v2.0.0"
   "touch-canvas": "distri/touch-canvas:v0.3.1"
 width: 1024

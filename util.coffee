@@ -11,3 +11,19 @@ Point::scale = (size) ->
       width = height = size
 
   Point(@x * width, @y * height)
+
+["x", "y"].forEach (name) ->
+  unless Rectangle.prototype[name]
+    Object.defineProperty Rectangle.prototype, name,
+      get: ->
+        @position[name]
+      set: (value) ->
+        @position[name] = value
+
+["width", "height"].forEach (name) ->
+  unless Rectangle.prototype[name]
+    Object.defineProperty Rectangle.prototype, name,
+      get: ->
+        @size[name]
+      set: (value) ->
+        @size[name] = value
