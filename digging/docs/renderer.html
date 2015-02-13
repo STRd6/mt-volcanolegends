@@ -39,6 +39,7 @@
 colors = [<span class="string">"tan"</span>, <span class="string">"#444"</span>]
 
 tileSize = <span class="number">16</span>
+designationColor = <span class="string">"rgba(255, 255, 0, 0.25)"</span>
 
 module.<span class="function"><span class="title">exports</span></span> = (I) -&gt;
   self = TouchCanvas(I)
@@ -46,6 +47,7 @@ module.<span class="function"><span class="title">exports</span></span> = (I) -&
   I.pan = Point I.pan
 
   self.attrAccessor <span class="string">"pan"</span> <span class="comment"># Pixel coordinates</span>
+  self.attrAccessor <span class="string">"activeDesignation"</span> <span class="comment"># World Coordinates</span>
 
   self.extend
     drawCharacter: (character) -&gt;
@@ -86,7 +88,16 @@ module.<span class="function"><span class="title">exports</span></span> = (I) -&
           self.drawTile x, y, <span class="string">"rgba(255, 0, 255, 0.25)"</span>
 
         designations.forEach ({x, y}) -&gt;
-          self.drawTile x, y, <span class="string">"rgba(255, 255, 0, 0.25)"</span>
+          self.drawTile x, y, designationColor
+
+        <span class="keyword">if</span> designation = self.activeDesignation()
+          {x, y, width, height} = designation
+          self.drawRect
+            x: x * tileSize
+            y: y * tileSize
+            width: width * tileSize
+            height: height * tileSize
+            color: designationColor
 
   <span class="keyword">return</span> self</code></pre>
 </div>

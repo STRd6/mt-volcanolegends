@@ -222,13 +222,13 @@
     },
     "pixie.cson": {
       "path": "pixie.cson",
-      "content": "remoteDependencies: [\n  \"https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.23.0/es6-shim.min.js\"\n]\ndependencies:\n  \"action-bar\": \"distri/action-bar:v0.0.1\"\n  cornerstone: \"distri/cornerstone:v0.2.8\"\n  priority_queue: \"STRd6/priority_queue:v2.0.0\"\n  \"touch-canvas\": \"distri/touch-canvas:v0.3.1\"\nwidth: 1024\nheight: 576\n",
+      "content": "remoteDependencies: [\n  \"https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.23.0/es6-shim.min.js\"\n]\ndependencies:\n  \"action-bar\": \"distri/action-bar:v0.0.1\"\n  cornerstone: \"distri/cornerstone:v0.2.9\"\n  priority_queue: \"STRd6/priority_queue:v2.0.0\"\n  \"touch-canvas\": \"distri/touch-canvas:v0.3.1\"\nwidth: 1024\nheight: 576\n",
       "mode": "100644",
       "type": "blob"
     },
     "renderer.coffee.md": {
       "path": "renderer.coffee.md",
-      "content": "Renderer\n========\n\n    TouchCanvas = require \"touch-canvas\"\n\n    colors = [\"tan\", \"#444\"]\n\n    tileSize = 16\n\n    module.exports = (I) ->\n      self = TouchCanvas(I)\n\n      I.pan = Point I.pan\n\n      self.attrAccessor \"pan\" # Pixel coordinates\n\n      self.extend\n        drawCharacter: (character) ->\n          {x, y} = character.position().add(0.5, 0.5).scale(tileSize)\n\n          self.drawCircle\n            x: x\n            y: y\n            radius: tileSize/2\n            color: \"blue\"\n\n        drawTile: (x, y, color) ->\n          self.drawRect\n            x: x * tileSize\n            y: y * tileSize\n            width: tileSize\n            height: tileSize\n            color: color\n\n        size: ->\n          width: self.width()\n          height: self.height()\n\n        tileSize: ->\n          width: tileSize\n          height: tileSize\n\n        render: ({terrain, characters, designations, debug}) ->\n          self.fill \"#000\"\n          {x, y} = self.pan()\n          self.withTransform Matrix.translation(x, y), ->\n            terrain.forEach (row, y) ->\n              row.forEach (tile, x) ->\n                self.drawTile x, y, colors[tile]\n\n            characters.forEach self.drawCharacter\n            debug.forEach ({x, y}) ->\n              self.drawTile x, y, \"rgba(255, 0, 255, 0.25)\"\n\n            designations.forEach ({x, y}) ->\n              self.drawTile x, y, \"rgba(255, 255, 0, 0.25)\"\n\n      return self\n",
+      "content": "Renderer\n========\n\n    TouchCanvas = require \"touch-canvas\"\n\n    colors = [\"tan\", \"#444\"]\n\n    tileSize = 16\n    designationColor = \"rgba(255, 255, 0, 0.25)\"\n\n    module.exports = (I) ->\n      self = TouchCanvas(I)\n\n      I.pan = Point I.pan\n\n      self.attrAccessor \"pan\" # Pixel coordinates\n      self.attrAccessor \"activeDesignation\" # World Coordinates\n\n      self.extend\n        drawCharacter: (character) ->\n          {x, y} = character.position().add(0.5, 0.5).scale(tileSize)\n\n          self.drawCircle\n            x: x\n            y: y\n            radius: tileSize/2\n            color: \"blue\"\n\n        drawTile: (x, y, color) ->\n          self.drawRect\n            x: x * tileSize\n            y: y * tileSize\n            width: tileSize\n            height: tileSize\n            color: color\n\n        size: ->\n          width: self.width()\n          height: self.height()\n\n        tileSize: ->\n          width: tileSize\n          height: tileSize\n\n        render: ({terrain, characters, designations, debug}) ->\n          self.fill \"#000\"\n          {x, y} = self.pan()\n          self.withTransform Matrix.translation(x, y), ->\n            terrain.forEach (row, y) ->\n              row.forEach (tile, x) ->\n                self.drawTile x, y, colors[tile]\n\n            characters.forEach self.drawCharacter\n            debug.forEach ({x, y}) ->\n              self.drawTile x, y, \"rgba(255, 0, 255, 0.25)\"\n\n            designations.forEach ({x, y}) ->\n              self.drawTile x, y, designationColor\n\n            if designation = self.activeDesignation()\n              {x, y, width, height} = designation\n              self.drawRect\n                x: x * tileSize\n                y: y * tileSize\n                width: width * tileSize\n                height: height * tileSize\n                color: designationColor\n\n      return self\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -264,13 +264,13 @@
     },
     "tools.coffee.md": {
       "path": "tools.coffee.md",
-      "content": "Tools\n=====\n\n    module.exports =\n      pan: do ->\n        initial = initialPan = null\n        touch: ({renderer, point}) ->\n          initial = point\n          initialPan = renderer.pan()\n        move: ({renderer, point}) ->\n          delta = point.subtract(initial)\n          p = Point delta.x * renderer.width(), delta.y * renderer.height()\n          renderer.pan initialPan.add p\n      designate:\n        release: ({world, worldPosition}) ->\n          world.designate worldPosition\n",
+      "content": "Tools\n=====\n\n    endDeltoid = (start, end) ->\n      if end.x < start.x\n        x = 0\n      else\n        x = 1\n\n      if end.y < start.y\n        y = 0\n      else\n        y = 1\n\n      end.add(Point(x, y))\n\n    module.exports =\n      pan: do ->\n        initial = initialPan = null\n        touch: ({renderer, point}) ->\n          initial = point\n          initialPan = renderer.pan()\n        move: ({renderer, point}) ->\n          delta = point.subtract(initial)\n          p = Point delta.x * renderer.width(), delta.y * renderer.height()\n          renderer.pan initialPan.add p\n      designate: do ->\n        initialPosition = null\n        touch: ({worldPosition}) ->\n          initialPosition = worldPosition\n        move: ({renderer, worldPosition}) ->\n          selectionEnd = endDeltoid(initialPosition, worldPosition)\n          selection = Rectangle.fromPoints(initialPosition, selectionEnd)\n\n          renderer.activeDesignation selection\n        release: ({world, worldPosition}) ->\n          world.designate worldPosition\n",
       "mode": "100644",
       "type": "blob"
     },
     "util.coffee": {
       "path": "util.coffee",
-      "content": "global.log = (args...) ->\n  console.log args...\n\nPoint::scale = (size) ->\n  if arguments.length is 2\n    [width, height] = arguments\n  else\n    if typeof size is \"object\"\n      {width, height} = size\n    else\n      width = height = size\n\n  Point(@x * width, @y * height)\n",
+      "content": "global.log = (args...) ->\n  console.log args...\n\nPoint::scale = (size) ->\n  if arguments.length is 2\n    [width, height] = arguments\n  else\n    if typeof size is \"object\"\n      {width, height} = size\n    else\n      width = height = size\n\n  Point(@x * width, @y * height)\n\n[\"x\", \"y\"].forEach (name) ->\n  unless Rectangle.prototype[name]\n    Object.defineProperty Rectangle.prototype, name,\n      get: ->\n        @position[name]\n      set: (value) ->\n        @position[name] = value\n\n[\"width\", \"height\"].forEach (name) ->\n  unless Rectangle.prototype[name]\n    Object.defineProperty Rectangle.prototype, name,\n      get: ->\n        @size[name]\n      set: (value) ->\n        @size[name] = value\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -319,12 +319,12 @@
     },
     "pixie": {
       "path": "pixie",
-      "content": "module.exports = {\"remoteDependencies\":[\"https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.23.0/es6-shim.min.js\"],\"dependencies\":{\"action-bar\":\"distri/action-bar:v0.0.1\",\"cornerstone\":\"distri/cornerstone:v0.2.8\",\"priority_queue\":\"STRd6/priority_queue:v2.0.0\",\"touch-canvas\":\"distri/touch-canvas:v0.3.1\"},\"width\":1024,\"height\":576};",
+      "content": "module.exports = {\"remoteDependencies\":[\"https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.23.0/es6-shim.min.js\"],\"dependencies\":{\"action-bar\":\"distri/action-bar:v0.0.1\",\"cornerstone\":\"distri/cornerstone:v0.2.9\",\"priority_queue\":\"STRd6/priority_queue:v2.0.0\",\"touch-canvas\":\"distri/touch-canvas:v0.3.1\"},\"width\":1024,\"height\":576};",
       "type": "blob"
     },
     "renderer": {
       "path": "renderer",
-      "content": "(function() {\n  var TouchCanvas, colors, tileSize;\n\n  TouchCanvas = require(\"touch-canvas\");\n\n  colors = [\"tan\", \"#444\"];\n\n  tileSize = 16;\n\n  module.exports = function(I) {\n    var self;\n    self = TouchCanvas(I);\n    I.pan = Point(I.pan);\n    self.attrAccessor(\"pan\");\n    self.extend({\n      drawCharacter: function(character) {\n        var x, y, _ref;\n        _ref = character.position().add(0.5, 0.5).scale(tileSize), x = _ref.x, y = _ref.y;\n        return self.drawCircle({\n          x: x,\n          y: y,\n          radius: tileSize / 2,\n          color: \"blue\"\n        });\n      },\n      drawTile: function(x, y, color) {\n        return self.drawRect({\n          x: x * tileSize,\n          y: y * tileSize,\n          width: tileSize,\n          height: tileSize,\n          color: color\n        });\n      },\n      size: function() {\n        return {\n          width: self.width(),\n          height: self.height()\n        };\n      },\n      tileSize: function() {\n        return {\n          width: tileSize,\n          height: tileSize\n        };\n      },\n      render: function(_arg) {\n        var characters, debug, designations, terrain, x, y, _ref;\n        terrain = _arg.terrain, characters = _arg.characters, designations = _arg.designations, debug = _arg.debug;\n        self.fill(\"#000\");\n        _ref = self.pan(), x = _ref.x, y = _ref.y;\n        return self.withTransform(Matrix.translation(x, y), function() {\n          terrain.forEach(function(row, y) {\n            return row.forEach(function(tile, x) {\n              return self.drawTile(x, y, colors[tile]);\n            });\n          });\n          characters.forEach(self.drawCharacter);\n          debug.forEach(function(_arg1) {\n            var x, y;\n            x = _arg1.x, y = _arg1.y;\n            return self.drawTile(x, y, \"rgba(255, 0, 255, 0.25)\");\n          });\n          return designations.forEach(function(_arg1) {\n            var x, y;\n            x = _arg1.x, y = _arg1.y;\n            return self.drawTile(x, y, \"rgba(255, 255, 0, 0.25)\");\n          });\n        });\n      }\n    });\n    return self;\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  var TouchCanvas, colors, designationColor, tileSize;\n\n  TouchCanvas = require(\"touch-canvas\");\n\n  colors = [\"tan\", \"#444\"];\n\n  tileSize = 16;\n\n  designationColor = \"rgba(255, 255, 0, 0.25)\";\n\n  module.exports = function(I) {\n    var self;\n    self = TouchCanvas(I);\n    I.pan = Point(I.pan);\n    self.attrAccessor(\"pan\");\n    self.attrAccessor(\"activeDesignation\");\n    self.extend({\n      drawCharacter: function(character) {\n        var x, y, _ref;\n        _ref = character.position().add(0.5, 0.5).scale(tileSize), x = _ref.x, y = _ref.y;\n        return self.drawCircle({\n          x: x,\n          y: y,\n          radius: tileSize / 2,\n          color: \"blue\"\n        });\n      },\n      drawTile: function(x, y, color) {\n        return self.drawRect({\n          x: x * tileSize,\n          y: y * tileSize,\n          width: tileSize,\n          height: tileSize,\n          color: color\n        });\n      },\n      size: function() {\n        return {\n          width: self.width(),\n          height: self.height()\n        };\n      },\n      tileSize: function() {\n        return {\n          width: tileSize,\n          height: tileSize\n        };\n      },\n      render: function(_arg) {\n        var characters, debug, designations, terrain, x, y, _ref;\n        terrain = _arg.terrain, characters = _arg.characters, designations = _arg.designations, debug = _arg.debug;\n        self.fill(\"#000\");\n        _ref = self.pan(), x = _ref.x, y = _ref.y;\n        return self.withTransform(Matrix.translation(x, y), function() {\n          var designation, height, width;\n          terrain.forEach(function(row, y) {\n            return row.forEach(function(tile, x) {\n              return self.drawTile(x, y, colors[tile]);\n            });\n          });\n          characters.forEach(self.drawCharacter);\n          debug.forEach(function(_arg1) {\n            var x, y;\n            x = _arg1.x, y = _arg1.y;\n            return self.drawTile(x, y, \"rgba(255, 0, 255, 0.25)\");\n          });\n          designations.forEach(function(_arg1) {\n            var x, y;\n            x = _arg1.x, y = _arg1.y;\n            return self.drawTile(x, y, designationColor);\n          });\n          if (designation = self.activeDesignation()) {\n            x = designation.x, y = designation.y, width = designation.width, height = designation.height;\n            return self.drawRect({\n              x: x * tileSize,\n              y: y * tileSize,\n              width: width * tileSize,\n              height: height * tileSize,\n              color: designationColor\n            });\n          }\n        });\n      }\n    });\n    return self;\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "selection": {
@@ -349,12 +349,12 @@
     },
     "tools": {
       "path": "tools",
-      "content": "(function() {\n  module.exports = {\n    pan: (function() {\n      var initial, initialPan;\n      initial = initialPan = null;\n      return {\n        touch: function(_arg) {\n          var point, renderer;\n          renderer = _arg.renderer, point = _arg.point;\n          initial = point;\n          return initialPan = renderer.pan();\n        },\n        move: function(_arg) {\n          var delta, p, point, renderer;\n          renderer = _arg.renderer, point = _arg.point;\n          delta = point.subtract(initial);\n          p = Point(delta.x * renderer.width(), delta.y * renderer.height());\n          return renderer.pan(initialPan.add(p));\n        }\n      };\n    })(),\n    designate: {\n      release: function(_arg) {\n        var world, worldPosition;\n        world = _arg.world, worldPosition = _arg.worldPosition;\n        return world.designate(worldPosition);\n      }\n    }\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  var endDeltoid;\n\n  endDeltoid = function(start, end) {\n    var x, y;\n    if (end.x < start.x) {\n      x = 0;\n    } else {\n      x = 1;\n    }\n    if (end.y < start.y) {\n      y = 0;\n    } else {\n      y = 1;\n    }\n    return end.add(Point(x, y));\n  };\n\n  module.exports = {\n    pan: (function() {\n      var initial, initialPan;\n      initial = initialPan = null;\n      return {\n        touch: function(_arg) {\n          var point, renderer;\n          renderer = _arg.renderer, point = _arg.point;\n          initial = point;\n          return initialPan = renderer.pan();\n        },\n        move: function(_arg) {\n          var delta, p, point, renderer;\n          renderer = _arg.renderer, point = _arg.point;\n          delta = point.subtract(initial);\n          p = Point(delta.x * renderer.width(), delta.y * renderer.height());\n          return renderer.pan(initialPan.add(p));\n        }\n      };\n    })(),\n    designate: (function() {\n      var initialPosition;\n      initialPosition = null;\n      return {\n        touch: function(_arg) {\n          var worldPosition;\n          worldPosition = _arg.worldPosition;\n          return initialPosition = worldPosition;\n        },\n        move: function(_arg) {\n          var renderer, selection, selectionEnd, worldPosition;\n          renderer = _arg.renderer, worldPosition = _arg.worldPosition;\n          selectionEnd = endDeltoid(initialPosition, worldPosition);\n          selection = Rectangle.fromPoints(initialPosition, selectionEnd);\n          return renderer.activeDesignation(selection);\n        },\n        release: function(_arg) {\n          var world, worldPosition;\n          world = _arg.world, worldPosition = _arg.worldPosition;\n          return world.designate(worldPosition);\n        }\n      };\n    })()\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "util": {
       "path": "util",
-      "content": "(function() {\n  var __slice = [].slice;\n\n  global.log = function() {\n    var args;\n    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];\n    return console.log.apply(console, args);\n  };\n\n  Point.prototype.scale = function(size) {\n    var height, width;\n    if (arguments.length === 2) {\n      width = arguments[0], height = arguments[1];\n    } else {\n      if (typeof size === \"object\") {\n        width = size.width, height = size.height;\n      } else {\n        width = height = size;\n      }\n    }\n    return Point(this.x * width, this.y * height);\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  var __slice = [].slice;\n\n  global.log = function() {\n    var args;\n    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];\n    return console.log.apply(console, args);\n  };\n\n  Point.prototype.scale = function(size) {\n    var height, width;\n    if (arguments.length === 2) {\n      width = arguments[0], height = arguments[1];\n    } else {\n      if (typeof size === \"object\") {\n        width = size.width, height = size.height;\n      } else {\n        width = height = size;\n      }\n    }\n    return Point(this.x * width, this.y * height);\n  };\n\n  [\"x\", \"y\"].forEach(function(name) {\n    if (!Rectangle.prototype[name]) {\n      return Object.defineProperty(Rectangle.prototype, name, {\n        get: function() {\n          return this.position[name];\n        },\n        set: function(value) {\n          return this.position[name] = value;\n        }\n      });\n    }\n  });\n\n  [\"width\", \"height\"].forEach(function(name) {\n    if (!Rectangle.prototype[name]) {\n      return Object.defineProperty(Rectangle.prototype, name, {\n        get: function() {\n          return this.size[name];\n        },\n        set: function(value) {\n          return this.size[name] = value;\n        }\n      });\n    }\n  });\n\n}).call(this);\n",
       "type": "blob"
     },
     "world": {
@@ -477,7 +477,7 @@
         },
         "pixie.cson": {
           "path": "pixie.cson",
-          "content": "version: \"0.2.8\"\nentryPoint: \"cornerstone\"\ndependencies:\n  bindable: \"distri/bindable:v0.1.0\"\n  core: \"distri/core:v0.6.0\"\n  extensions: \"distri/extensions:v0.2.0\"\n  inflector: \"distri/inflector:v0.2.1\"\n  math: \"distri/math:v0.2.2\"\n  model: \"distri/model:v0.1.3\"\n  observable: \"distri/observable:v0.3.1\"\n  q: \"distri/q:v1.0.1\"\n  util: \"distri/util:v0.1.0\"\n",
+          "content": "version: \"0.2.9\"\nentryPoint: \"cornerstone\"\ndependencies:\n  bindable: \"distri/bindable:v0.1.0\"\n  core: \"distri/core:v0.6.0\"\n  extensions: \"distri/extensions:v0.2.0\"\n  inflector: \"distri/inflector:v0.2.1\"\n  math: \"distri/math:v0.2.3\"\n  model: \"distri/model:v0.1.3\"\n  observable: \"distri/observable:v0.3.1\"\n  q: \"distri/q:v1.0.1\"\n  util: \"distri/util:v0.1.0\"\n",
           "mode": "100644",
           "type": "blob"
         },
@@ -508,7 +508,7 @@
         },
         "pixie": {
           "path": "pixie",
-          "content": "module.exports = {\"version\":\"0.2.8\",\"entryPoint\":\"cornerstone\",\"dependencies\":{\"bindable\":\"distri/bindable:v0.1.0\",\"core\":\"distri/core:v0.6.0\",\"extensions\":\"distri/extensions:v0.2.0\",\"inflector\":\"distri/inflector:v0.2.1\",\"math\":\"distri/math:v0.2.2\",\"model\":\"distri/model:v0.1.3\",\"observable\":\"distri/observable:v0.3.1\",\"q\":\"distri/q:v1.0.1\",\"util\":\"distri/util:v0.1.0\"}};",
+          "content": "module.exports = {\"version\":\"0.2.9\",\"entryPoint\":\"cornerstone\",\"dependencies\":{\"bindable\":\"distri/bindable:v0.1.0\",\"core\":\"distri/core:v0.6.0\",\"extensions\":\"distri/extensions:v0.2.0\",\"inflector\":\"distri/inflector:v0.2.1\",\"math\":\"distri/math:v0.2.3\",\"model\":\"distri/model:v0.1.3\",\"observable\":\"distri/observable:v0.3.1\",\"q\":\"distri/q:v1.0.1\",\"util\":\"distri/util:v0.1.0\"}};",
           "type": "blob"
         },
         "point": {
@@ -530,10 +530,10 @@
       "progenitor": {
         "url": "http://www.danielx.net/editor/"
       },
-      "version": "0.2.8",
+      "version": "0.2.9",
       "entryPoint": "cornerstone",
       "repository": {
-        "branch": "v0.2.8",
+        "branch": "v0.2.9",
         "default_branch": "master",
         "full_name": "distri/cornerstone",
         "homepage": null,
@@ -1482,13 +1482,13 @@
             },
             "math.coffee.md": {
               "path": "math.coffee.md",
-              "content": "Math\n====\n\nRequire and export many math libraries.\n\n    Point = require \"point\"\n    Size = require \"size\"\n\n    Matrix = require \"matrix\"\n    Matrix.Point = Point\n\n    Random = require \"random\"\n\n    module.exports = self =\n      Point: Point\n      Matrix: Matrix\n      Random: Random\n      rand: Random.rand\n      Size: Size\n      version: require(\"./pixie\").version\n\nPollute all libraries to the global namespace.\n\n      pollute: ->\n        Object.keys(self).forEach (key) ->\n          return if key is \"version\"\n          return if key is \"pollute\"\n\n          global[key] = self[key]\n\n        return self\n",
+              "content": "Math\n====\n\nRequire and export many math libraries.\n\n    Point = require \"point\"\n    Size = require \"size\"\n\n    Matrix = require \"matrix\"\n    Matrix.Point = Point\n\n    Random = require \"random\"\n\n    module.exports = self =\n      Point: Point\n      Matrix: Matrix\n      Random: Random\n      Rectangle: require \"./rectangle\"\n      rand: Random.rand\n      Size: Size\n      version: require(\"./pixie\").version\n\nPollute all libraries to the global namespace.\n\n      pollute: ->\n        Object.keys(self).forEach (key) ->\n          return if key is \"version\"\n          return if key is \"pollute\"\n\n          global[key] = self[key]\n\n        return self\n",
               "mode": "100644",
               "type": "blob"
             },
             "pixie.cson": {
               "path": "pixie.cson",
-              "content": "entryPoint: \"math\"\nversion: \"0.2.2\"\ndependencies:\n  point: \"distri/point:v0.2.0\"\n  matrix: \"distri/matrix:v0.3.1\"\n  random: \"distri/random:v0.2.0\"\n  size: \"distri/size:v0.1.3\"\n",
+              "content": "entryPoint: \"math\"\nversion: \"0.2.3\"\ndependencies:\n  point: \"distri/point:v0.2.0\"\n  matrix: \"distri/matrix:v0.3.1\"\n  random: \"distri/random:v0.2.0\"\n  size: \"distri/size:v0.1.4\"\n",
               "mode": "100644",
               "type": "blob"
             },
@@ -1497,32 +1497,52 @@
               "content": "require(\"../math\").pollute()\n\nconsole.log global\n\ndescribe \"Point\", ->\n  it \"should exist\", ->\n    assert Point\n\n  it \"should construct points\", ->\n    assert Point()\n\ndescribe \"Matrix\", ->\n  it \"should exist and return matrices when invoked\", ->\n    assert Matrix\n\n    assert Matrix()\n\n  it \"should use the same `Point` class\", ->\n    assert Matrix.Point is Point\n\n    assert Matrix().transformPoint(Point()) instanceof Point\n\ndescribe \"Random\", ->\n  it \"should exist\", ->\n    assert Random\n\ndescribe \"rand\", ->\n  it \"should exist\", ->\n    assert rand\n\n    assert rand()?\n\ndescribe \"Size\", ->\n  it \"should exist\", ->\n    assert Size\n\ndescribe \"Math\", ->\n  it \"should have a version\", ->\n    assert require(\"../math\").version\n",
               "mode": "100644",
               "type": "blob"
+            },
+            "rectangle.coffee.md": {
+              "path": "rectangle.coffee.md",
+              "content": "Rectangle\n=========\n\nA rectangle is a size at a given position.\n\n    {abs, min} = Math\n\n    Size = require \"size\"\n\n    module.exports = Rectangle = (position, size) ->\n      console.log \"lol rekt\"\n      if position?.size?\n        {position, size} = position\n\n      position: Point(position)\n      size: Size(size)\n      __proto__: Rectangle.prototype\n\n    Rectangle.prototype =\n      each: (iterator) ->\n        p = @position\n\n        @size.each (x, y) ->\n          iterator(p.x + x, p.y + y)\n\n    Rectangle.fromPoints = (start, end) ->\n      Rectangle Point(min(start.x, end.x), min(start.y, end.y)), Size(abs(end.x - start.x), abs(end.y - start.y))\n",
+              "mode": "100644"
+            },
+            "test/rectangle.coffee": {
+              "path": "test/rectangle.coffee",
+              "content": "{Point, Size, Rectangle} = require \"../math\"\n\ndescribe \"rectangle\", ->\n  it \"should iterate\", ->\n    rectangle = Rectangle\n      position: Point(2, 2)\n      size: Size(2, 2)\n\n    total = 0\n    rectangle.each (x, y) ->\n      total += 1\n\n    assert.equal total, 4\n",
+              "mode": "100644"
             }
           },
           "distribution": {
             "math": {
               "path": "math",
-              "content": "(function() {\n  var Matrix, Point, Random, Size, self;\n\n  Point = require(\"point\");\n\n  Size = require(\"size\");\n\n  Matrix = require(\"matrix\");\n\n  Matrix.Point = Point;\n\n  Random = require(\"random\");\n\n  module.exports = self = {\n    Point: Point,\n    Matrix: Matrix,\n    Random: Random,\n    rand: Random.rand,\n    Size: Size,\n    version: require(\"./pixie\").version,\n    pollute: function() {\n      Object.keys(self).forEach(function(key) {\n        if (key === \"version\") {\n          return;\n        }\n        if (key === \"pollute\") {\n          return;\n        }\n        return global[key] = self[key];\n      });\n      return self;\n    }\n  };\n\n}).call(this);\n",
+              "content": "(function() {\n  var Matrix, Point, Random, Size, self;\n\n  Point = require(\"point\");\n\n  Size = require(\"size\");\n\n  Matrix = require(\"matrix\");\n\n  Matrix.Point = Point;\n\n  Random = require(\"random\");\n\n  module.exports = self = {\n    Point: Point,\n    Matrix: Matrix,\n    Random: Random,\n    Rectangle: require(\"./rectangle\"),\n    rand: Random.rand,\n    Size: Size,\n    version: require(\"./pixie\").version,\n    pollute: function() {\n      Object.keys(self).forEach(function(key) {\n        if (key === \"version\") {\n          return;\n        }\n        if (key === \"pollute\") {\n          return;\n        }\n        return global[key] = self[key];\n      });\n      return self;\n    }\n  };\n\n}).call(this);\n",
               "type": "blob"
             },
             "pixie": {
               "path": "pixie",
-              "content": "module.exports = {\"entryPoint\":\"math\",\"version\":\"0.2.2\",\"dependencies\":{\"point\":\"distri/point:v0.2.0\",\"matrix\":\"distri/matrix:v0.3.1\",\"random\":\"distri/random:v0.2.0\",\"size\":\"distri/size:v0.1.3\"}};",
+              "content": "module.exports = {\"entryPoint\":\"math\",\"version\":\"0.2.3\",\"dependencies\":{\"point\":\"distri/point:v0.2.0\",\"matrix\":\"distri/matrix:v0.3.1\",\"random\":\"distri/random:v0.2.0\",\"size\":\"distri/size:v0.1.4\"}};",
               "type": "blob"
             },
             "test/math": {
               "path": "test/math",
               "content": "(function() {\n  require(\"../math\").pollute();\n\n  console.log(global);\n\n  describe(\"Point\", function() {\n    it(\"should exist\", function() {\n      return assert(Point);\n    });\n    return it(\"should construct points\", function() {\n      return assert(Point());\n    });\n  });\n\n  describe(\"Matrix\", function() {\n    it(\"should exist and return matrices when invoked\", function() {\n      assert(Matrix);\n      return assert(Matrix());\n    });\n    return it(\"should use the same `Point` class\", function() {\n      assert(Matrix.Point === Point);\n      return assert(Matrix().transformPoint(Point()) instanceof Point);\n    });\n  });\n\n  describe(\"Random\", function() {\n    return it(\"should exist\", function() {\n      return assert(Random);\n    });\n  });\n\n  describe(\"rand\", function() {\n    return it(\"should exist\", function() {\n      assert(rand);\n      return assert(rand() != null);\n    });\n  });\n\n  describe(\"Size\", function() {\n    return it(\"should exist\", function() {\n      return assert(Size);\n    });\n  });\n\n  describe(\"Math\", function() {\n    return it(\"should have a version\", function() {\n      return assert(require(\"../math\").version);\n    });\n  });\n\n}).call(this);\n",
               "type": "blob"
+            },
+            "rectangle": {
+              "path": "rectangle",
+              "content": "(function() {\n  var Rectangle, Size, abs, min;\n\n  abs = Math.abs, min = Math.min;\n\n  Size = require(\"size\");\n\n  module.exports = Rectangle = function(position, size) {\n    var _ref;\n    console.log(\"lol rekt\");\n    if ((position != null ? position.size : void 0) != null) {\n      _ref = position, position = _ref.position, size = _ref.size;\n    }\n    return {\n      position: Point(position),\n      size: Size(size),\n      __proto__: Rectangle.prototype\n    };\n  };\n\n  Rectangle.prototype = {\n    each: function(iterator) {\n      var p;\n      p = this.position;\n      return this.size.each(function(x, y) {\n        return iterator(p.x + x, p.y + y);\n      });\n    }\n  };\n\n  Rectangle.fromPoints = function(start, end) {\n    return Rectangle(Point(min(start.x, end.x), min(start.y, end.y)), Size(abs(end.x - start.x), abs(end.y - start.y)));\n  };\n\n}).call(this);\n",
+              "type": "blob"
+            },
+            "test/rectangle": {
+              "path": "test/rectangle",
+              "content": "(function() {\n  var Point, Rectangle, Size, _ref;\n\n  _ref = require(\"../math\"), Point = _ref.Point, Size = _ref.Size, Rectangle = _ref.Rectangle;\n\n  describe(\"rectangle\", function() {\n    return it(\"should iterate\", function() {\n      var rectangle, total;\n      rectangle = Rectangle({\n        position: Point(2, 2),\n        size: Size(2, 2)\n      });\n      total = 0;\n      rectangle.each(function(x, y) {\n        return total += 1;\n      });\n      return assert.equal(total, 4);\n    });\n  });\n\n}).call(this);\n",
+              "type": "blob"
             }
           },
           "progenitor": {
             "url": "http://www.danielx.net/editor/"
           },
-          "version": "0.2.2",
+          "version": "0.2.3",
           "entryPoint": "math",
           "repository": {
-            "branch": "v0.2.2",
+            "branch": "v0.2.3",
             "default_branch": "master",
             "full_name": "distri/math",
             "homepage": null,
@@ -2092,13 +2112,13 @@
                 },
                 "pixie.cson": {
                   "path": "pixie.cson",
-                  "content": "version: \"0.1.3\"\n",
+                  "content": "version: \"0.1.4\"\n",
                   "mode": "100644",
                   "type": "blob"
                 },
                 "test/test.coffee": {
                   "path": "test/test.coffee",
-                  "content": "Size = require \"../main\"\n\ndescribe \"Size\", ->\n  it \"should have a width and height\", ->\n    size = Size(10, 10)\n\n    assert.equal size.width, 10\n    assert.equal size.height, 10\n\n  it \"should be createable from an array\", ->\n    size = Size [5, 4]\n\n    assert.equal size.width, 5\n    assert.equal size.height, 4\n\n  it \"should be createable from an object\", ->\n    size = Size\n      width: 6\n      height: 7\n\n    assert.equal size.width, 6\n    assert.equal size.height, 7\n\n  it \"should iterate\", ->\n    size = Size(4, 5)\n    total = 0\n\n    size.each (x, y) ->\n      total += 1\n\n    assert.equal total, 20\n",
+                  "content": "Size = require \"../main\"\n\ndescribe \"Size\", ->\n  it \"should have a width and height\", ->\n    size = Size(10, 10)\n\n    assert.equal size.width, 10\n    assert.equal size.height, 10\n\n  it \"should be createable from an array\", ->\n    size = Size [5, 4]\n\n    assert.equal size.width, 5\n    assert.equal size.height, 4\n\n  it \"should be createable from an object\", ->\n    size = Size\n      width: 6\n      height: 7\n\n    assert.equal size.width, 6\n    assert.equal size.height, 7\n\n  it \"should iterate\", ->\n    size = Size(4, 5)\n    total = 0\n\n    size.each (x, y) ->\n      total += 1\n\n    assert.equal total, 20\n\n  it \"should have no iterations when empty\", ->\n    size = Size(0, 0)\n    total = 0\n\n    size.each (x, y) ->\n      total += 1\n\n    assert.equal total, 0\n",
                   "mode": "100644",
                   "type": "blob"
                 }
@@ -2111,22 +2131,22 @@
                 },
                 "pixie": {
                   "path": "pixie",
-                  "content": "module.exports = {\"version\":\"0.1.3\"};",
+                  "content": "module.exports = {\"version\":\"0.1.4\"};",
                   "type": "blob"
                 },
                 "test/test": {
                   "path": "test/test",
-                  "content": "(function() {\n  var Size;\n\n  Size = require(\"../main\");\n\n  describe(\"Size\", function() {\n    it(\"should have a width and height\", function() {\n      var size;\n      size = Size(10, 10);\n      assert.equal(size.width, 10);\n      return assert.equal(size.height, 10);\n    });\n    it(\"should be createable from an array\", function() {\n      var size;\n      size = Size([5, 4]);\n      assert.equal(size.width, 5);\n      return assert.equal(size.height, 4);\n    });\n    it(\"should be createable from an object\", function() {\n      var size;\n      size = Size({\n        width: 6,\n        height: 7\n      });\n      assert.equal(size.width, 6);\n      return assert.equal(size.height, 7);\n    });\n    return it(\"should iterate\", function() {\n      var size, total;\n      size = Size(4, 5);\n      total = 0;\n      size.each(function(x, y) {\n        return total += 1;\n      });\n      return assert.equal(total, 20);\n    });\n  });\n\n}).call(this);\n",
+                  "content": "(function() {\n  var Size;\n\n  Size = require(\"../main\");\n\n  describe(\"Size\", function() {\n    it(\"should have a width and height\", function() {\n      var size;\n      size = Size(10, 10);\n      assert.equal(size.width, 10);\n      return assert.equal(size.height, 10);\n    });\n    it(\"should be createable from an array\", function() {\n      var size;\n      size = Size([5, 4]);\n      assert.equal(size.width, 5);\n      return assert.equal(size.height, 4);\n    });\n    it(\"should be createable from an object\", function() {\n      var size;\n      size = Size({\n        width: 6,\n        height: 7\n      });\n      assert.equal(size.width, 6);\n      return assert.equal(size.height, 7);\n    });\n    it(\"should iterate\", function() {\n      var size, total;\n      size = Size(4, 5);\n      total = 0;\n      size.each(function(x, y) {\n        return total += 1;\n      });\n      return assert.equal(total, 20);\n    });\n    return it(\"should have no iterations when empty\", function() {\n      var size, total;\n      size = Size(0, 0);\n      total = 0;\n      size.each(function(x, y) {\n        return total += 1;\n      });\n      return assert.equal(total, 0);\n    });\n  });\n\n}).call(this);\n",
                   "type": "blob"
                 }
               },
               "progenitor": {
                 "url": "http://www.danielx.net/editor/"
               },
-              "version": "0.1.3",
+              "version": "0.1.4",
               "entryPoint": "main",
               "repository": {
-                "branch": "v0.1.3",
+                "branch": "v0.1.4",
                 "default_branch": "master",
                 "full_name": "distri/size",
                 "homepage": null,
