@@ -34,18 +34,18 @@
               </div>
               
             </div>
-            <div class="content"><pre><code class="lang-coffeescript"><span class="function"><span class="title">endDeltoid</span></span> = (start, end) -&gt;
-  <span class="keyword">if</span> end.x &lt; start.x
+            <div class="content"><pre><code class="lang-coffeescript"><span class="function"><span class="title">rectangleFromSelection</span></span> = (start, end) -&gt;
+  <span class="keyword">if</span> end.x &gt; start.x
     x = <span class="number">0</span>
   <span class="keyword">else</span>
     x = <span class="number">1</span>
 
-  <span class="keyword">if</span> end.y &lt; start.y
+  <span class="keyword">if</span> end.y &gt; start.y
     y = <span class="number">0</span>
   <span class="keyword">else</span>
     y = <span class="number">1</span>
 
-  end.add(Point(x, y))
+  Rectangle.fromPoints(start.add(Point(x, y)), end)
 
 module.exports =
   pan: <span class="keyword">do</span> -&gt;
@@ -62,10 +62,7 @@ module.exports =
     touch: ({worldPosition}) -&gt;
       initialPosition = worldPosition
     move: ({renderer, worldPosition}) -&gt;
-      selectionEnd = endDeltoid(initialPosition, worldPosition)
-      selection = Rectangle.fromPoints(initialPosition, selectionEnd)
-
-      renderer.activeDesignation selection
+      renderer.activeDesignation rectangleFromSelection(initialPosition, worldPosition)
     release: ({world, worldPosition}) -&gt;
       world.designate worldPosition</code></pre>
 </div>
