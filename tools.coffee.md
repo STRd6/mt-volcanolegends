@@ -2,17 +2,19 @@ Tools
 =====
 
     rectangleFromSelection = (start, end) ->
+      p1 = Point(0, 0)
+      p2 = Point(0, 0)
       if end.x > start.x
-        x = 0
+        p2.x = 1
       else
-        x = 1
+        p1.x = 1
 
       if end.y > start.y
-        y = 0
+        p2.y = 1
       else
-        y = 1
+        p1.y = 1
 
-      Rectangle.fromPoints(start.add(Point(x, y)), end)
+      Rectangle.fromPoints(start.add(p1), end.add(p2))
 
     module.exports =
       pan: do ->
@@ -31,4 +33,5 @@ Tools
         move: ({renderer, worldPosition}) ->
           renderer.activeDesignation rectangleFromSelection(initialPosition, worldPosition)
         release: ({world, worldPosition}) ->
-          world.designate worldPosition
+          rectangleFromSelection(initialPosition, worldPosition).each (x, y) ->
+            world.designate Point(x, y)
