@@ -23,6 +23,13 @@ World
 
       designations = PositionSet()
 
+      heuristic = (a, b) ->
+        a.distance(b)
+
+      passableNeighbors = (p) ->
+        self.neighbors(p).filter ([point, dist]) ->
+          self.passable(point)
+
       self =
         accessiblePositions: ->
           accessiblePositions
@@ -51,12 +58,17 @@ World
               [p.add(x, y), Math.sqrt(x * x + y * y)]
           .flatten()
 
+        pathTo: (start, target) ->
+          Graph.aStar
+            initial: start
+            goal: target
+            neighbors: passableNeighbors
+            heuristic: heuristic
+
         accessible: (start, distance) ->
           Graph.accessible
             initial: start
-            neighbors: (p) ->
-              self.neighbors(p).filter ([point, dist]) ->
-                self.passable(point)
+            neighbors: passableNeighbors
 
             distanceMax: distance
 

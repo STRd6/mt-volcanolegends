@@ -12,8 +12,14 @@ This is a dwarf-like guy who walks around and digs stuff.
       adjacent = (p1, p2) ->
         p2.subtract(p1).magnitude() < 1.5 # Closer than approx root 2
 
+      path = []
+
       self.extend
         ai: (world) ->
+          if path.length
+            self.position path.shift()
+            return
+
           position = self.position()
           designationsArray = world.designations().toArray()
 
@@ -34,8 +40,10 @@ This is a dwarf-like guy who walks around and digs stuff.
                 memo || adjacent(designation, position)
               , false
 
+            # TODO: Be sure to sort to go to the closest!
             if p = nearDesignations.first()
-              self.position p.first()
+              # TODO: Set a path
+              path = world.pathTo(self.position(), p.first())
             else
               # TODO: Check farther designations
 
