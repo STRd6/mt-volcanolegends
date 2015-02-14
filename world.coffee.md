@@ -4,6 +4,7 @@ World
     require "cornerstone"
     Character = require "./character"
     Graph = require "./lib/graph"
+    PositionSet = require "./lib/position_set"
 
     module.exports = (I={}) ->
       defaults I,
@@ -20,37 +21,58 @@ World
 
       accessiblePositions = []
 
+      designations = PositionSet()
+
       self =
         accessiblePositions: ->
           accessiblePositions
 
+        set: ({x, y}, value) ->
+          return unless 0 <= y < I.height
+          return unless 0 <= x < I.width
+
+          I.terrain[y][x] = value
+
+        get: (p) ->
+          I.terrain[p.y]?[p.x]
+
         passable: (p) ->
-          I.terrain[p.y]?[p.x] is 0
-  
+          self.get(p) is 0
+
+        designate: (p) ->
+          designations.push p
+
+        designations: ->
+          designations
+
         neighbors: (p) ->
           [-1, 0, 1].map (y) ->
             [-1, 0, 1].map (x) ->
               [p.add(x, y), Math.sqrt(x * x + y * y)]
           .flatten()
-  
+
         accessible: (start, distance) ->
           Graph.accessible
             initial: start
             neighbors: (p) ->
               self.neighbors(p).filter ([point, dist]) ->
                 self.passable(point)
-  
+
             distanceMax: distance
-  
+
         select: (start, end) ->
           log start, end
-  
+
         characters: ->
           characters
 
         tick: ->
+          # Remove digging designations from open spaces
+          designations.forEach (p) ->
+            designations.remove p if self.get(p) is 0
+
           # Pathfind for characters
-          accessiblePositions = self.accessible characters.first().position(), 10
+          characters.first().ai(self)
 
         terrain: ->
           I.terrain

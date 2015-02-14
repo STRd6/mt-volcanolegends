@@ -10,15 +10,17 @@ Game
 
     module.exports = ->
       register = require("./lib/hotkeys")
-
       tool = TOOLS.designate
 
+      actions = Observable ["designate", "pan"].map (name) ->
+        name: name
+        perform: ->
+          tool = TOOLS[name]
+
       register "0", ->
-        log "yolo"
         tool = TOOLS.pan
 
       register "1", ->
-        log "yolo2"
         tool = TOOLS.designate
 
       renderer = Renderer
@@ -26,7 +28,7 @@ Game
         height: height
 
       toScreen = (point) ->
-        point.scale(renderer.size()).add(renderer.pan())
+        point.scale(renderer.size()).subtract(renderer.pan())
       toWorld = (point) ->
         toScreen(point).scale(Size(renderer.tileSize()).inverse()).floor()
 
@@ -35,17 +37,27 @@ Game
           tool[event]?(
             renderer: renderer
             point: Point(point)
-            world: toWorld Point(point)
+            world: world
+            worldPosition: toWorld Point(point)
           )
 
       world = World()
 
+      c = 0
       setInterval ->
-        world.tick()
+        c += 1
+        if c % 10 is 0
+          world.tick()
         renderer.render
           characters: world.characters()
+          designations: world.designations()
           terrain: world.terrain()
           debug: world.accessiblePositions()
       , 1/60
 
-      return renderer.element()
+      ActionBar = require "action-bar"
+      gameElement = document.createElement "div"
+      gameElement.appendChild renderer.element()
+      gameElement.appendChild ActionBar(actions: actions)
+
+      return gameElement
