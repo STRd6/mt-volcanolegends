@@ -44,17 +44,21 @@ module.<span class="function"><span class="title">exports</span></span> = -&gt;
   <span class="function"><span class="title">add</span></span> = (point) -&gt;
     map.set key(point), point
 
-  add: add
-  push: add
+  self =
+    add: add
+    push: add
 
-  clear: -&gt;
-    map.clear()
+    toArray: -&gt;
+      Array.from(map.values())
 
-  forEach: (fn) -&gt;
-    Array.from(map.values()).forEach fn
+    clear: -&gt;
+      map.clear()
 
-  remove: (point) -&gt;
-    map.<span class="keyword">delete</span> key(point)</code></pre>
+    forEach: (fn) -&gt;
+      self.toArray().forEach fn
+
+    remove: (point) -&gt;
+      map.<span class="keyword">delete</span> key(point)</code></pre>
 </div>
         </li>
         

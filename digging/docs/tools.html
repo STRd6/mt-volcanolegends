@@ -65,9 +65,11 @@ module.exports =
       initialPosition = worldPosition
     move: ({renderer, worldPosition}) -&gt;
       renderer.activeDesignation rectangleFromSelection(initialPosition, worldPosition)
-    release: ({world, worldPosition}) -&gt;
+    release: ({renderer, world, worldPosition}) -&gt;
       rectangleFromSelection(initialPosition, worldPosition).each (x, y) -&gt;
-        world.designate Point(x, y)</code></pre>
+        world.designate Point(x, y)
+
+      renderer.activeDesignation <span class="literal">null</span></code></pre>
 </div>
         </li>
         

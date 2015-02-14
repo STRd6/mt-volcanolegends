@@ -100,15 +100,12 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
       characters
 
     tick: -&gt;
-      <span class="comment"># Pathfind for characters</span>
-      accessiblePositions = self.accessible characters.first().position(), <span class="number">10</span>
-
-      <span class="comment"># Process designations</span>
-      <span class="comment"># TODO: Schedule characters to move around rather than just clearing them</span>
+      <span class="comment"># Remove digging designations from open spaces</span>
       designations.forEach (p) -&gt;
-        self.set p, <span class="number">0</span>
+        designations.remove p <span class="keyword">if</span> self.get(p) <span class="keyword">is</span> <span class="number">0</span>
 
-      designations.clear()
+      <span class="comment"># Pathfind for characters</span>
+      characters.first().ai(self)
 
     terrain: -&gt;
       I.terrain</code></pre>

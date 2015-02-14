@@ -41,6 +41,41 @@
 
   self.attrAccessor <span class="string">"position"</span>
 
+  <span class="function"><span class="title">adjacent</span></span> = (p1, p2) -&gt;
+    p2.subtract(p1).magnitude() &lt; <span class="number">1.5</span> <span class="comment"># Closer than approx root 2</span>
+
+  self.extend
+    ai: (world) -&gt;
+      position = self.position()
+      designationsArray = world.designations().toArray()
+
+      <span class="comment"># If a designation is adjacent to us dig it</span>
+      adjacentDesignations = designationsArray.filter (p) -&gt;
+        adjacent(p, position) 
+
+      <span class="keyword">if</span> d = adjacentDesignations.first()
+        <span class="comment"># TODO: Non-instantaneous digging</span>
+        world.set d, <span class="number">0</span>
+      <span class="keyword">else</span>
+        <span class="comment"># Pathfind to a position that has adjacent designations</span>
+        accessiblePositions = world.accessible(self.position(), <span class="number">10</span>)
+
+        nearDesignations = accessiblePositions.filter ([position, distance]) -&gt;
+          <span class="comment"># Find positions with adjacent designations</span>
+          designationsArray.reduce (memo, designation) -&gt;
+            memo || adjacent(designation, position)
+          , <span class="literal">false</span>
+
+
+        console.log nearDesignations
+
+        <span class="keyword">if</span> p = nearDesignations.first()
+          self.position p.first()
+
+      <span class="comment"># else</span>
+      <span class="comment"># Move to a nearby position that we can reach that has</span>
+      <span class="comment"># designations we can dig</span>
+
   <span class="keyword">return</span> self</code></pre>
 </div>
         </li>
