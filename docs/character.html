@@ -44,8 +44,14 @@
   <span class="function"><span class="title">adjacent</span></span> = (p1, p2) -&gt;
     p2.subtract(p1).magnitude() &lt; <span class="number">1.5</span> <span class="comment"># Closer than approx root 2</span>
 
+  path = []
+
   self.extend
     ai: (world) -&gt;
+      <span class="keyword">if</span> path.length
+        self.position path.shift()
+        <span class="keyword">return</span>
+
       position = self.position()
       designationsArray = world.designations().toArray()
 
@@ -66,8 +72,10 @@
             memo || adjacent(designation, position)
           , <span class="literal">false</span>
 
+        <span class="comment"># TODO: Be sure to sort to go to the closest!</span>
         <span class="keyword">if</span> p = nearDesignations.first()
-          self.position p.first()
+          <span class="comment"># TODO: Set a path</span>
+          path = world.pathTo(self.position(), p.first())
         <span class="keyword">else</span>
           <span class="comment"># TODO: Check farther designations</span>
 

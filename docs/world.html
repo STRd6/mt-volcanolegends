@@ -56,6 +56,13 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
 
   designations = PositionSet()
 
+  <span class="function"><span class="title">heuristic</span></span> = (a, b) -&gt;
+    a.distance(b)
+
+  <span class="function"><span class="title">passableNeighbors</span></span> = (p) -&gt;
+    self.neighbors(p).filter ([point, dist]) -&gt;
+      self.passable(point)
+
   self =
     accessiblePositions: -&gt;
       accessiblePositions
@@ -84,12 +91,17 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
           [p.add(x, y), Math.sqrt(x * x + y * y)]
       .flatten()
 
+    pathTo: (start, target) -&gt;
+      Graph.aStar
+        initial: start
+        goal: target
+        neighbors: passableNeighbors
+        heuristic: heuristic
+
     accessible: (start, distance) -&gt;
       Graph.accessible
         initial: start
-        neighbors: (p) -&gt;
-          self.neighbors(p).filter ([point, dist]) -&gt;
-            self.passable(point)
+        neighbors: passableNeighbors
 
         distanceMax: distance
 
