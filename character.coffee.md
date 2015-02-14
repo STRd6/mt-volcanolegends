@@ -19,7 +19,7 @@ This is a dwarf-like guy who walks around and digs stuff.
 
           # If a designation is adjacent to us dig it
           adjacentDesignations = designationsArray.filter (p) ->
-            adjacent(p, position) 
+            adjacent(p, position)
 
           if d = adjacentDesignations.first()
             # TODO: Non-instantaneous digging
@@ -34,11 +34,10 @@ This is a dwarf-like guy who walks around and digs stuff.
                 memo || adjacent(designation, position)
               , false
 
-            
-            console.log nearDesignations
-
             if p = nearDesignations.first()
               self.position p.first()
+            else
+              # TODO: Check farther designations
 
           # else
           # Move to a nearby position that we can reach that has
