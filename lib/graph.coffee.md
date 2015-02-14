@@ -120,4 +120,4 @@ Find all the nodes accessible within the given distance.
             push node, current, distance
 
         Array.from(nodes.values()).map (value) ->
-          value.node
+          [value.node, value.g]

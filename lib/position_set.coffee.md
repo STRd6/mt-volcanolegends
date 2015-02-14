@@ -12,14 +12,18 @@ A set of 2d positions.
       add = (point) ->
         map.set key(point), point
 
-      add: add
-      push: add
+      self =
+        add: add
+        push: add
 
-      clear: ->
-        map.clear()
+        toArray: ->
+          Array.from(map.values())
 
-      forEach: (fn) ->
-        Array.from(map.values()).forEach fn
+        clear: ->
+          map.clear()
 
-      remove: (point) ->
-        map.delete key(point)
+        forEach: (fn) ->
+          self.toArray().forEach fn
+
+        remove: (point) ->
+          map.delete key(point)

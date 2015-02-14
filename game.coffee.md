@@ -43,8 +43,11 @@ Game
 
       world = World()
 
+      c = 0
       setInterval ->
-        world.tick()
+        c += 1
+        if c % 10 is 0
+          world.tick()
         renderer.render
           characters: world.characters()
           designations: world.designations()

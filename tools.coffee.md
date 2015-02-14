@@ -32,6 +32,8 @@ Tools
           initialPosition = worldPosition
         move: ({renderer, worldPosition}) ->
           renderer.activeDesignation rectangleFromSelection(initialPosition, worldPosition)
-        release: ({world, worldPosition}) ->
+        release: ({renderer, world, worldPosition}) ->
           rectangleFromSelection(initialPosition, worldPosition).each (x, y) ->
             world.designate Point(x, y)
+
+          renderer.activeDesignation null

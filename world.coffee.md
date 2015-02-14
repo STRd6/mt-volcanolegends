@@ -67,15 +67,12 @@ World
           characters
 
         tick: ->
-          # Pathfind for characters
-          accessiblePositions = self.accessible characters.first().position(), 10
-
-          # Process designations
-          # TODO: Schedule characters to move around rather than just clearing them
+          # Remove digging designations from open spaces
           designations.forEach (p) ->
-            self.set p, 0
+            designations.remove p if self.get(p) is 0
 
-          designations.clear()
+          # Pathfind for characters
+          characters.first().ai(self)
 
         terrain: ->
           I.terrain
