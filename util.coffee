@@ -1,5 +1,12 @@
-global.log = (args...) ->
-  console.log args...
+extend global,
+  log: (args...) ->
+    console.log args...
+
+  time: (label) ->
+    console.time label
+
+  timeEnd: (label) ->
+    console.timeEnd label
 
 Point::scale = (size) ->
   if arguments.length is 2

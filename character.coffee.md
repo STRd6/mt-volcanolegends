@@ -23,6 +23,9 @@ This is a dwarf-like guy who walks around and digs stuff.
           position = self.position()
           designationsArray = world.designations().toArray()
 
+          return if designationsArray.length is 0
+          time "AI"
+
           # If a designation is adjacent to us dig it
           adjacentDesignations = designationsArray.filter (p) ->
             adjacent(p, position)
@@ -47,8 +50,6 @@ This is a dwarf-like guy who walks around and digs stuff.
             else
               # TODO: Check farther designations
 
-          # else
-          # Move to a nearby position that we can reach that has
-          # designations we can dig
+            timeEnd "AI"
 
       return self
