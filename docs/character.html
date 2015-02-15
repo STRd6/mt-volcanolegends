@@ -64,7 +64,7 @@
 
       <span class="keyword">if</span> d = adjacentDesignations.first()
         <span class="comment"># TODO: Non-instantaneous digging</span>
-        world.set d, <span class="number">0</span>
+        world.dig d
       <span class="keyword">else</span>
         <span class="comment"># Pathfind to a position that has adjacent designations</span>
         accessiblePositions = world.accessible(self.position(), <span class="number">10</span>)

@@ -59,6 +59,15 @@ module.<span class="function"><span class="title">exports</span></span> = (I) -&
         radius: tileSize/<span class="number">2</span>
         color: <span class="string">"blue"</span>
 
+    drawItem: (item) -&gt;
+      {x, y} = item.position().add(<span class="number">0.5</span>, <span class="number">0.5</span>).scale(tileSize)
+
+      self.drawCircle
+        x: x
+        y: y
+        radius: tileSize/<span class="number">4</span>
+        color: <span class="string">"gray"</span>
+
     drawTile: (x, y, color) -&gt;
       self.drawRect
         x: x * tileSize
@@ -75,13 +84,15 @@ module.<span class="function"><span class="title">exports</span></span> = (I) -&
       width: tileSize
       height: tileSize
 
-    render: ({terrain, characters, designations, debug}) -&gt;
+    render: ({terrain, characters, designations, debug, items}) -&gt;
       self.fill <span class="string">"#000"</span>
       {x, y} = self.pan()
       self.withTransform Matrix.translation(x, y), -&gt;
         terrain.forEach (row, y) -&gt;
           row.forEach (tile, x) -&gt;
             self.drawTile x, y, colors[tile]
+
+        items.forEach self.drawItem
 
         characters.forEach self.drawCharacter
         debug.forEach ({x, y}) -&gt;

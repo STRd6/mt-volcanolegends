@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>game</title>
+  <title>item</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="http://strd6.github.io/cdn/parallel/docco.css" />
@@ -18,7 +18,7 @@
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h1 id="game">Game</h1>
+              <h1 id="item">Item</h1>
 
             </div>
             <div class="content"><pre><code class="lang-coffeescript">
@@ -32,69 +32,16 @@
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              
+              <p>Items are things like stone blocks, chairs, seed pods or whatever.</p>
+
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">Renderer = require(<span class="string">"./renderer"</span>)
-World = require(<span class="string">"./world"</span>)
+            <div class="content"><pre><code class="lang-coffeescript">module.<span class="function"><span class="title">exports</span></span> = (I={}, self=Model(I)) -&gt;
+  defaults I,
+    position: Point(<span class="number">0</span>, <span class="number">0</span>)
 
-{width, height} = require <span class="string">"./pixie"</span>
+  self.attrAccessor <span class="string">"name"</span>, <span class="string">"position"</span>
 
-TOOLS = require(<span class="string">"./tools"</span>)
-
-module.<span class="function"><span class="title">exports</span></span> = -&gt;
-  register = require(<span class="string">"./lib/hotkeys"</span>)
-  tool = TOOLS.designate
-
-  actions = Observable [<span class="string">"designate"</span>, <span class="string">"pan"</span>].map (name) -&gt;
-    name: name
-    perform: -&gt;
-      tool = TOOLS[name]
-
-  register <span class="string">"0"</span>, -&gt;
-    tool = TOOLS.pan
-
-  register <span class="string">"1"</span>, -&gt;
-    tool = TOOLS.designate
-
-  renderer = Renderer
-    width: width
-    height: height
-
-  <span class="function"><span class="title">toScreen</span></span> = (point) -&gt;
-    point.scale(renderer.size()).subtract(renderer.pan())
-  <span class="function"><span class="title">toWorld</span></span> = (point) -&gt;
-    toScreen(point).scale(Size(renderer.tileSize()).inverse()).floor()
-
-  [<span class="string">"touch"</span>, <span class="string">"move"</span>, <span class="string">"release"</span>].forEach (event) -&gt;
-    renderer.<span class="literal">on</span> event, (point) -&gt;
-      tool[event]?(
-        renderer: renderer
-        point: Point(point)
-        world: world
-        worldPosition: toWorld Point(point)
-      )
-
-  world = World()
-
-  c = <span class="number">0</span>
-  setInterval -&gt;
-    c += <span class="number">1</span>
-    <span class="keyword">if</span> c % <span class="number">10</span> <span class="keyword">is</span> <span class="number">0</span>
-      world.tick()
-    renderer.render
-      characters: world.characters()
-      designations: world.designations()
-      terrain: world.terrain()
-      debug: world.accessiblePositions()
-      items: world.items()
-  , <span class="number">1</span>/<span class="number">60</span>
-
-  ActionBar = require <span class="string">"action-bar"</span>
-  gameElement = document.createElement <span class="string">"div"</span>
-  gameElement.appendChild renderer.element()
-  gameElement.appendChild ActionBar(actions: actions)
-
-  <span class="keyword">return</span> gameElement</code></pre>
+  <span class="keyword">return</span> self</code></pre>
 </div>
         </li>
         

@@ -36,6 +36,7 @@
             </div>
             <div class="content"><pre><code class="lang-coffeescript">require <span class="string">"cornerstone"</span>
 Character = require <span class="string">"./character"</span>
+Item = require <span class="string">"./item"</span>
 Graph = require <span class="string">"./lib/graph"</span>
 PositionSet = require <span class="string">"./lib/position_set"</span>
 
@@ -54,6 +55,8 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
 
   accessiblePositions = []
 
+  items = []
+
   designations = PositionSet()
 
   <span class="function"><span class="title">heuristic</span></span> = (a, b) -&gt;
@@ -67,6 +70,9 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
     accessiblePositions: -&gt;
       accessiblePositions
 
+    items: -&gt;
+      items
+
     set: ({x, y}, value) -&gt;
       <span class="keyword">return</span> <span class="keyword">unless</span> <span class="number">0</span> &lt;= y &lt; I.height
       <span class="keyword">return</span> <span class="keyword">unless</span> <span class="number">0</span> &lt;= x &lt; I.width
@@ -78,6 +84,12 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
 
     passable: (p) -&gt;
       self.get(p) <span class="keyword">is</span> <span class="number">0</span>
+
+    dig: (p) -&gt;
+      self.set p, <span class="number">0</span>
+      items.push Item
+        position: p
+        name: <span class="string">"stone"</span>
 
     designate: (p) -&gt;
       designations.push p
