@@ -55,6 +55,9 @@
       position = self.position()
       designationsArray = world.designations().toArray()
 
+      <span class="keyword">return</span> <span class="keyword">if</span> designationsArray.length <span class="keyword">is</span> <span class="number">0</span>
+      time <span class="string">"AI"</span>
+
       <span class="comment"># If a designation is adjacent to us dig it</span>
       adjacentDesignations = designationsArray.filter (p) -&gt;
         adjacent(p, position)
@@ -79,9 +82,7 @@
         <span class="keyword">else</span>
           <span class="comment"># TODO: Check farther designations</span>
 
-      <span class="comment"># else</span>
-      <span class="comment"># Move to a nearby position that we can reach that has</span>
-      <span class="comment"># designations we can dig</span>
+        timeEnd <span class="string">"AI"</span>
 
   <span class="keyword">return</span> self</code></pre>
 </div>
