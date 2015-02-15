@@ -3,6 +3,7 @@ World
 
     require "cornerstone"
     Character = require "./character"
+    Item = require "./item"
     Graph = require "./lib/graph"
     PositionSet = require "./lib/position_set"
 
@@ -21,6 +22,8 @@ World
 
       accessiblePositions = []
 
+      items = []
+
       designations = PositionSet()
 
       heuristic = (a, b) ->
@@ -34,6 +37,9 @@ World
         accessiblePositions: ->
           accessiblePositions
 
+        items: ->
+          items
+
         set: ({x, y}, value) ->
           return unless 0 <= y < I.height
           return unless 0 <= x < I.width
@@ -45,6 +51,12 @@ World
 
         passable: (p) ->
           self.get(p) is 0
+
+        dig: (p) ->
+          self.set p, 0
+          items.push Item
+            position: p
+            name: "stone"
 
         designate: (p) ->
           designations.push p

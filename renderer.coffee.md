@@ -26,6 +26,15 @@ Renderer
             radius: tileSize/2
             color: "blue"
 
+        drawItem: (item) ->
+          {x, y} = item.position().add(0.5, 0.5).scale(tileSize)
+
+          self.drawCircle
+            x: x
+            y: y
+            radius: tileSize/4
+            color: "gray"
+
         drawTile: (x, y, color) ->
           self.drawRect
             x: x * tileSize
@@ -42,13 +51,15 @@ Renderer
           width: tileSize
           height: tileSize
 
-        render: ({terrain, characters, designations, debug}) ->
+        render: ({terrain, characters, designations, debug, items}) ->
           self.fill "#000"
           {x, y} = self.pan()
           self.withTransform Matrix.translation(x, y), ->
             terrain.forEach (row, y) ->
               row.forEach (tile, x) ->
                 self.drawTile x, y, colors[tile]
+
+            items.forEach self.drawItem
 
             characters.forEach self.drawCharacter
             debug.forEach ({x, y}) ->

@@ -53,6 +53,7 @@ Game
           designations: world.designations()
           terrain: world.terrain()
           debug: world.accessiblePositions()
+          items: world.items()
       , 1/60
 
       ActionBar = require "action-bar"

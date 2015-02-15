@@ -32,7 +32,7 @@ This is a dwarf-like guy who walks around and digs stuff.
 
           if d = adjacentDesignations.first()
             # TODO: Non-instantaneous digging
-            world.set d, 0
+            world.dig d
           else
             # Pathfind to a position that has adjacent designations
             accessiblePositions = world.accessible(self.position(), 10)
