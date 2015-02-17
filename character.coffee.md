@@ -50,6 +50,6 @@ This is a dwarf-like guy who walks around and digs stuff.
             else
               # TODO: Check farther designations
 
-            timeEnd "AI"
+          timeEnd "AI"
 
       return self
