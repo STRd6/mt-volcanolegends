@@ -52,7 +52,7 @@ Game
           characters: world.characters()
           designations: world.designations()
           terrain: world.terrain()
-          debug: world.accessiblePositions()
+          debug: world.debugSets()
           items: world.items()
       , 1/60
 

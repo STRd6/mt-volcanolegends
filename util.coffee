@@ -1,3 +1,5 @@
+require "cornerstone"
+
 extend global,
   log: (args...) ->
     console.log args...

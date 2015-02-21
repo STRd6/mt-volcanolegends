@@ -1,7 +1,6 @@
 Mt. Volcanolegends
 ==================
 
-    require "cornerstone"
     require "./util"
 
     style = document.createElement "style"

@@ -8,6 +8,13 @@ Renderer
     tileSize = 16
     designationColor = "rgba(255, 255, 0, 0.25)"
 
+    debugColors = [1..6].map (n) ->
+      r = 255 * (n & 4)
+      g = 255 * (n & 2)
+      b = 255 * (n & 1)
+
+      "rgba(#{r}, #{g}, #{b}, 0.25)"
+
     module.exports = (I) ->
       self = TouchCanvas(I)
 
@@ -62,8 +69,10 @@ Renderer
             items.forEach self.drawItem
 
             characters.forEach self.drawCharacter
-            debug.forEach ({x, y}) ->
-              self.drawTile x, y, "rgba(255, 0, 255, 0.25)"
+            debug.forEach (positions, i) ->
+              color = debugColors[i]
+              positions.forEach ({x, y}) ->
+                self.drawTile x, y, color
 
             designations.forEach ({x, y}) ->
               self.drawTile x, y, designationColor

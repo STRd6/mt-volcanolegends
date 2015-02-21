@@ -73,7 +73,10 @@ uniquely identifies nodes.
 
           current = openSet.pop()
 
-          if equals current, goal
+          if typeof goal is 'function'
+            if goal(current)
+              return getPath(current)
+          else if equals current, goal
             return getPath(goal)
 
           neighbors(current).forEach ([node, distance]) ->

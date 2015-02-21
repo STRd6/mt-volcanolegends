@@ -20,10 +20,11 @@ World
         Character()
       ]
 
-      accessiblePositions = []
+      debugSets = []
 
       items = []
-
+      
+      workSites = PositionSet()
       designations = PositionSet()
 
       heuristic = (a, b) ->
@@ -34,8 +35,8 @@ World
           self.passable(point)
 
       self =
-        accessiblePositions: ->
-          accessiblePositions
+        debugSets: ->
+          debugSets
 
         items: ->
           items
@@ -77,6 +78,12 @@ World
             neighbors: passableNeighbors
             heuristic: heuristic
 
+        pathToNearest: (start, target) ->
+          Graph.aStar
+            initial: start
+            goal: target
+            neighbors: passableNeighbors
+
         accessible: (start, distance) ->
           Graph.accessible
             initial: start
@@ -95,8 +102,17 @@ World
           designations.forEach (p) ->
             designations.remove p if self.get(p) is 0
 
+          workSites = designations.expand()
+
+          debugSets = [
+            workSites
+          ]
+
           # Pathfind for characters
           characters.first().ai(self)
 
         terrain: ->
           I.terrain
+
+        workSites: ->
+          workSites
