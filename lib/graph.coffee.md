@@ -3,6 +3,18 @@ Graph Search
 
     PriorityQueue = require "priority_queue"
 
+    NodeMap = (key) ->
+      nodes = new Map
+
+      get: (node) ->
+        nodes.get key node
+
+      set: (node, value) ->
+        nodes.set key(node), value
+
+      values: ->
+        Array.from(nodes.values())
+
     module.exports =
 
 A* Pathfinding
@@ -26,13 +38,7 @@ uniquely identifies nodes.
         iterationsMax = 1000
 
         # Table to track our node meta-data
-        nodes = new Map
-
-        get = (node) ->
-          nodes.get key node
-
-        set = (node, value) ->
-          nodes.set key(node), value
+        {get, set} = NodeMap(key)
 
         openSet = PriorityQueue
           low: true
@@ -90,14 +96,7 @@ Find all the nodes accessible within the given distance.
         key ?= (node) ->
           "#{node}"
 
-        get = (node) ->
-          nodes.get key node
-
-        set = (node, value) ->
-          nodes.set key(node), value
-
-        # Table to track our node meta-data
-        nodes = new Map
+        {get, set, values} = NodeMap(key)
 
         openSet = PriorityQueue
           low: true
@@ -122,5 +121,5 @@ Find all the nodes accessible within the given distance.
           neighbors(current).forEach ([node, distance]) ->
             push node, current, distance
 
-        Array.from(nodes.values()).map (value) ->
+        values().map (value) ->
           [value.node, value.g]

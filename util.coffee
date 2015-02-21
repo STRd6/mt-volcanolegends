@@ -10,6 +10,20 @@ extend global,
   timeEnd: (label) ->
     console.timeEnd label
 
+  Model: do (OldModel=Model) ->
+    (I={}, self=OldModel(I)) ->
+      self.extend
+        attrData: (name, DataModel) ->
+          I[name] = DataModel(I[name])
+
+          self[name] = (newValue) ->
+            if arguments.length > 0
+              I[name] = DataModel(newValue)
+            else
+              I[name]
+
+      return self
+
 Point::scale = (size) ->
   if arguments.length is 2
     [width, height] = arguments

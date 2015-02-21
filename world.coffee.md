@@ -18,6 +18,10 @@ World
 
       characters = [
         Character()
+        Character
+          position:
+            x: 50
+            y: 30
       ]
 
       debugSets = []
@@ -109,7 +113,7 @@ World
           ]
 
           # Pathfind for characters
-          characters.first().ai(self)
+          characters.invoke("ai", self)
 
         terrain: ->
           I.terrain

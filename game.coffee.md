@@ -46,7 +46,7 @@ Game
       c = 0
       setInterval ->
         c += 1
-        if c % 10 is 0
+        if c % 5 is 0
           world.tick()
         renderer.render
           characters: world.characters()
