@@ -48,10 +48,7 @@
 
             </div>
             <div class="content"><pre><code class="lang-coffeescript">module.<span class="function"><span class="title">exports</span></span> = (I={}, self=Model(I)) -&gt;
-  defaults I,
-    position: Point(<span class="number">0</span>, <span class="number">0</span>)
-
-  self.attrAccessor <span class="string">"position"</span>
+  self.attrData <span class="string">"position"</span>, Point
 
   {adjacent, neighbors} = require <span class="string">"./metric"</span>
 

@@ -36,6 +36,18 @@
             </div>
             <div class="content"><pre><code class="lang-coffeescript">PriorityQueue = require <span class="string">"priority_queue"</span>
 
+<span class="function"><span class="title">NodeMap</span></span> = (key) -&gt;
+  nodes = <span class="keyword">new</span> Map
+
+  get: (node) -&gt;
+    nodes.get key node
+
+  set: (node, value) -&gt;
+    nodes.set key(node), value
+
+  values: -&gt;
+    Array.from(nodes.values())
+
 module.exports =</code></pre>
 </div>
         </li>
@@ -66,13 +78,7 @@ uniquely identifies nodes.</p>
     iterationsMax = <span class="number">1000</span>
 
     <span class="comment"># Table to track our node meta-data</span>
-    nodes = <span class="keyword">new</span> Map
-
-    <span class="function"><span class="title">get</span></span> = (node) -&gt;
-      nodes.get key node
-
-    <span class="function"><span class="title">set</span></span> = (node, value) -&gt;
-      nodes.set key(node), value
+    {get, set} = NodeMap(key)
 
     openSet = PriorityQueue
       low: <span class="literal">true</span>
@@ -139,14 +145,7 @@ uniquely identifies nodes.</p>
     key ?= (node) -&gt;
       <span class="string">"<span class="subst">#{node}</span>"</span>
 
-    <span class="function"><span class="title">get</span></span> = (node) -&gt;
-      nodes.get key node
-
-    <span class="function"><span class="title">set</span></span> = (node, value) -&gt;
-      nodes.set key(node), value
-
-    <span class="comment"># Table to track our node meta-data</span>
-    nodes = <span class="keyword">new</span> Map
+    {get, set, values} = NodeMap(key)
 
     openSet = PriorityQueue
       low: <span class="literal">true</span>
@@ -171,7 +170,7 @@ uniquely identifies nodes.</p>
       neighbors(current).forEach ([node, distance]) -&gt;
         push node, current, distance
 
-    Array.from(nodes.values()).map (value) -&gt;
+    values().map (value) -&gt;
       [value.node, value.g]</code></pre>
 </div>
         </li>

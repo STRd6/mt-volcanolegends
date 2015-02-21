@@ -79,7 +79,7 @@ module.<span class="function"><span class="title">exports</span></span> = -&gt;
   c = <span class="number">0</span>
   setInterval -&gt;
     c += <span class="number">1</span>
-    <span class="keyword">if</span> c % <span class="number">10</span> <span class="keyword">is</span> <span class="number">0</span>
+    <span class="keyword">if</span> c % <span class="number">5</span> <span class="keyword">is</span> <span class="number">0</span>
       world.tick()
     renderer.render
       characters: world.characters()

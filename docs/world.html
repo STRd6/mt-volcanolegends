@@ -51,6 +51,10 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
 
   characters = [
     Character()
+    Character
+      position:
+        x: <span class="number">50</span>
+        y: <span class="number">30</span>
   ]
 
   debugSets = []
@@ -142,7 +146,7 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
       ]
 
       <span class="comment"># Pathfind for characters</span>
-      characters.first().ai(self)
+      characters.invoke(<span class="string">"ai"</span>, self)
 
     terrain: -&gt;
       I.terrain
