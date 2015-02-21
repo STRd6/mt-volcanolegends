@@ -41,6 +41,13 @@ colors = [<span class="string">"tan"</span>, <span class="string">"#444"</span>]
 tileSize = <span class="number">16</span>
 designationColor = <span class="string">"rgba(255, 255, 0, 0.25)"</span>
 
+debugColors = [<span class="number">1.</span><span class="number">.6</span>].map (n) -&gt;
+  r = <span class="number">255</span> * (n &amp; <span class="number">4</span>)
+  g = <span class="number">255</span> * (n &amp; <span class="number">2</span>)
+  b = <span class="number">255</span> * (n &amp; <span class="number">1</span>)
+
+  <span class="string">"rgba(<span class="subst">#{r}</span>, <span class="subst">#{g}</span>, <span class="subst">#{b}</span>, 0.25)"</span>
+
 module.<span class="function"><span class="title">exports</span></span> = (I) -&gt;
   self = TouchCanvas(I)
 
@@ -95,8 +102,10 @@ module.<span class="function"><span class="title">exports</span></span> = (I) -&
         items.forEach self.drawItem
 
         characters.forEach self.drawCharacter
-        debug.forEach ({x, y}) -&gt;
-          self.drawTile x, y, <span class="string">"rgba(255, 0, 255, 0.25)"</span>
+        debug.forEach (positions, i) -&gt;
+          color = debugColors[i]
+          positions.forEach ({x, y}) -&gt;
+            self.drawTile x, y, color
 
         designations.forEach ({x, y}) -&gt;
           self.drawTile x, y, designationColor

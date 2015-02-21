@@ -53,10 +53,11 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
     Character()
   ]
 
-  accessiblePositions = []
+  debugSets = []
 
   items = []
 
+  workSites = PositionSet()
   designations = PositionSet()
 
   <span class="function"><span class="title">heuristic</span></span> = (a, b) -&gt;
@@ -67,8 +68,8 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
       self.passable(point)
 
   self =
-    accessiblePositions: -&gt;
-      accessiblePositions
+    debugSets: -&gt;
+      debugSets
 
     items: -&gt;
       items
@@ -110,6 +111,12 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
         neighbors: passableNeighbors
         heuristic: heuristic
 
+    pathToNearest: (start, target) -&gt;
+      Graph.aStar
+        initial: start
+        goal: target
+        neighbors: passableNeighbors
+
     accessible: (start, distance) -&gt;
       Graph.accessible
         initial: start
@@ -128,11 +135,20 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
       designations.forEach (p) -&gt;
         designations.remove p <span class="keyword">if</span> self.get(p) <span class="keyword">is</span> <span class="number">0</span>
 
+      workSites = designations.expand()
+
+      debugSets = [
+        workSites
+      ]
+
       <span class="comment"># Pathfind for characters</span>
       characters.first().ai(self)
 
     terrain: -&gt;
-      I.terrain</code></pre>
+      I.terrain
+
+    workSites: -&gt;
+      workSites</code></pre>
 </div>
         </li>
         

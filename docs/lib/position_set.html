@@ -38,7 +38,20 @@
             <div class="content"><pre><code class="lang-coffeescript"><span class="function"><span class="title">key</span></span> = ({x, y}) -&gt;
   <span class="string">"<span class="subst">#{x}</span>,<span class="subst">#{y}</span>"</span>
 
-module.<span class="function"><span class="title">exports</span></span> = -&gt;
+<span class="function"><span class="title">neighbors</span></span> = (p) -&gt;
+  [
+    p.add(-<span class="number">1</span>, -<span class="number">1</span>)
+    p.add( <span class="number">0</span>, -<span class="number">1</span>)
+    p.add( <span class="number">1</span>, -<span class="number">1</span>)
+    p.add(-<span class="number">1</span>, <span class="number">0</span>)
+    p.add( <span class="number">0</span>, <span class="number">0</span>)
+    p.add( <span class="number">1</span>, <span class="number">0</span>)
+    p.add(-<span class="number">1</span>, <span class="number">1</span>)
+    p.add( <span class="number">0</span>, <span class="number">1</span>)
+    p.add( <span class="number">1</span>, <span class="number">1</span>)
+  ]
+
+module.exports = <span class="function"><span class="title">PositionSet</span></span> = -&gt;
   map = <span class="keyword">new</span> Map
 
   <span class="function"><span class="title">add</span></span> = (point) -&gt;
@@ -48,17 +61,31 @@ module.<span class="function"><span class="title">exports</span></span> = -&gt;
     add: add
     push: add
 
+    empty: -&gt;
+      map.size <span class="keyword">is</span> <span class="number">0</span>
+
     toArray: -&gt;
       Array.from(map.values())
 
     clear: -&gt;
       map.clear()
 
+    has: (p) -&gt;
+      map.has key(p)
+
     forEach: (fn) -&gt;
       self.toArray().forEach fn
 
     remove: (point) -&gt;
-      map.<span class="keyword">delete</span> key(point)</code></pre>
+      map.<span class="keyword">delete</span> key(point)
+
+    expand: -&gt;
+      result = PositionSet()
+
+      self.forEach (p) -&gt;
+        neighbors(p).forEach result.add
+
+      <span class="keyword">return</span> result</code></pre>
 </div>
         </li>
         

@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>main</title>
+  <title>metric</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="http://strd6.github.io/cdn/parallel/docco.css" />
@@ -18,7 +18,7 @@
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h1 id="mt-volcanolegends">Mt. Volcanolegends</h1>
+              <h1 id="metric">Metric</h1>
 
             </div>
             <div class="content"><pre><code class="lang-coffeescript">
@@ -34,15 +34,22 @@
               </div>
               
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">require <span class="string">"./util"</span>
-
-style = document.createElement <span class="string">"style"</span>
-style.innerText = require <span class="string">"./style"</span>
-
-document.head.appendChild style
-
-Game = require <span class="string">"./game"</span>
-document.body.appendChild Game()</code></pre>
+            <div class="content"><pre><code class="lang-coffeescript">module.exports =
+  adjacent: (p1, p2) -&gt;
+    (-<span class="number">1</span> &lt;= (p1.x - p2.x) &lt;= <span class="number">1</span>) &amp;&amp;
+    (-<span class="number">1</span> &lt;= (p1.y - p2.y) &lt;= <span class="number">1</span>)
+  neighbors: (p) -&gt;
+    [
+      p.add(-<span class="number">1</span>, -<span class="number">1</span>)
+      p.add( <span class="number">0</span>, -<span class="number">1</span>)
+      p.add( <span class="number">1</span>, -<span class="number">1</span>)
+      p.add(-<span class="number">1</span>, <span class="number">0</span>)
+      p.add( <span class="number">0</span>, <span class="number">0</span>)
+      p.add( <span class="number">1</span>, <span class="number">0</span>)
+      p.add(-<span class="number">1</span>, <span class="number">1</span>)
+      p.add( <span class="number">0</span>, <span class="number">1</span>)
+      p.add( <span class="number">1</span>, <span class="number">1</span>)
+    ]</code></pre>
 </div>
         </li>
         
