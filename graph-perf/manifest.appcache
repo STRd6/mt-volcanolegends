@@ -1,0 +1,12 @@
+CACHE MANIFEST
+# 1424637573541
+
+CACHE:
+index.html
+../graph-perf.json.js
+https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.23.0/es6-shim.min.js
+
+NETWORK:
+https://*
+http://*
+*
