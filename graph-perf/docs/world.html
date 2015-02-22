@@ -103,10 +103,16 @@ module.<span class="function"><span class="title">exports</span></span> = (I={})
       designations
 
     neighbors: (p) -&gt;
-      [-<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>].map (y) -&gt;
-        [-<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>].map (x) -&gt;
-          [p.add(x, y), x.abs() + y.abs()]
-      .flatten()
+      [
+        [p.add(-<span class="number">1</span>, -<span class="number">1</span>), <span class="number">2</span>]
+        [p.add(<span class="number">0</span>, -<span class="number">1</span>), <span class="number">1</span>]
+        [p.add(<span class="number">1</span>, -<span class="number">1</span>), <span class="number">2</span>]
+        [p.add(-<span class="number">1</span>, <span class="number">0</span>), <span class="number">1</span>]
+        [p.add(<span class="number">1</span>, <span class="number">0</span>), <span class="number">1</span>]
+        [p.add(-<span class="number">1</span>, <span class="number">1</span>), <span class="number">2</span>]
+        [p.add(<span class="number">0</span>, <span class="number">1</span>), <span class="number">1</span>]
+        [p.add(<span class="number">1</span>, <span class="number">1</span>), <span class="number">2</span>]
+      ]
 
     pathTo: (start, target) -&gt;
       Graph.aStar
