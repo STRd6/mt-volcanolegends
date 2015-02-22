@@ -64,7 +64,7 @@ module.exports =</code></pre>
 uniquely identifies nodes.</p>
 
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">  aStar: ({initial, goal, heuristic, neighbors, key}) -&gt;
+            <div class="content"><pre><code class="lang-coffeescript">  aStar: ({initial, goal, heuristic, iterationsMax, neighbors, key}) -&gt;
     heuristic ?= -&gt; <span class="number">0</span>
     neighbors ?= -&gt; []
     key ?= (node) -&gt;
@@ -75,7 +75,7 @@ uniquely identifies nodes.</p>
 
     <span class="comment"># Prevent hanging by capping max iterations</span>
     iterations = <span class="number">0</span>
-    iterationsMax = <span class="number">1000</span>
+    iterationsMax ?= <span class="number">5000</span>
 
     <span class="comment"># Table to track our node meta-data</span>
     {get, set} = NodeMap(key)
