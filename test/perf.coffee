@@ -8,6 +8,12 @@ neighbors = (p) ->
       [p.add(x, y), Math.sqrt(x * x + y * y)]
   .flatten()
 
+neighborsB = (p) ->
+  [-1, 0, 1].map (y) ->
+    [-1, 0, 1].map (x) ->
+      [p.add(x, y), x.abs() + y.abs()]
+  .flatten()
+
 describe "perf", ->
   it "adjacent", ->
     adjacentA = (p1, p2) ->
@@ -44,3 +50,12 @@ describe "perf", ->
       neighbors: neighbors
         
     timeEnd "Graph"
+    
+    time "GraphB"
+    Graph.aStar
+      initial: Point(0, 0)
+      goal: ->
+        false
+      neighbors: neighborsB
+        
+    timeEnd "GraphB"

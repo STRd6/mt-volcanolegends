@@ -24,7 +24,7 @@ Return a path from initial to goal or `undefined` if no path exists.
 Initial and goal are assumed to be nodes that have a toString function that
 uniquely identifies nodes.
 
-      aStar: ({initial, goal, heuristic, neighbors, key}) ->
+      aStar: ({initial, goal, heuristic, iterationsMax, neighbors, key}) ->
         heuristic ?= -> 0
         neighbors ?= -> []
         key ?= (node) ->
@@ -35,7 +35,7 @@ uniquely identifies nodes.
 
         # Prevent hanging by capping max iterations
         iterations = 0
-        iterationsMax = 1000
+        iterationsMax ?= 5000
 
         # Table to track our node meta-data
         {get, set} = NodeMap(key)
