@@ -1,5 +1,13 @@
 require "../util"
 
+Graph = require "../lib/graph"
+
+neighbors = (p) ->
+  [-1, 0, 1].map (y) ->
+    [-1, 0, 1].map (x) ->
+      [p.add(x, y), Math.sqrt(x * x + y * y)]
+  .flatten()
+
 describe "perf", ->
   it "adjacent", ->
     adjacentA = (p1, p2) ->
@@ -26,3 +34,13 @@ describe "perf", ->
     iterations.times (i) ->
       adjacentB(points[i], points[i+1])
     timeEnd "AdjacentB"
+
+  it "Graph Search", ->
+    time "Graph"
+    Graph.aStar
+      initial: Point(0, 0)
+      goal: ->
+        false
+      neighbors: neighbors
+        
+    timeEnd "Graph"

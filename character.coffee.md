@@ -8,7 +8,7 @@ This is a dwarf-like guy who walks around and digs stuff.
     module.exports = (I={}, self=Model(I)) ->
       self.attrData "position", Point
 
-      {adjacent, neighbors} = require "./metric"
+      {neighbors} = require "./metric"
 
       path = []
 
@@ -32,7 +32,7 @@ This is a dwarf-like guy who walks around and digs stuff.
               designations.has p
             .first()
 
-            if target 
+            if target
               world.dig target
           else
             path = world.pathToNearest(self.position(), workSites.has)

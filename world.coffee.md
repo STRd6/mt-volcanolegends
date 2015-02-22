@@ -27,7 +27,7 @@ World
       debugSets = []
 
       items = []
-      
+
       workSites = PositionSet()
       designations = PositionSet()
 
