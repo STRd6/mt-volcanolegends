@@ -27,7 +27,7 @@ World
       debugSets = []
 
       items = []
-      
+
       workSites = PositionSet()
       designations = PositionSet()
 
@@ -70,10 +70,16 @@ World
           designations
 
         neighbors: (p) ->
-          [-1, 0, 1].map (y) ->
-            [-1, 0, 1].map (x) ->
-              [p.add(x, y), Math.sqrt(x * x + y * y)]
-          .flatten()
+          [
+            [p.add(-1, -1), 2]
+            [p.add(0, -1), 1]
+            [p.add(1, -1), 2]
+            [p.add(-1, 0), 1]
+            [p.add(1, 0), 1]
+            [p.add(-1, 1), 2]
+            [p.add(0, 1), 1]
+            [p.add(1, 1), 2]
+          ]
 
         pathTo: (start, target) ->
           Graph.aStar
